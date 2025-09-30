@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteo - Importaciones Davicross S.A.C</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <style>
+        /* style.css */
+
+        /* --- Variables CSS --- */
+        :root {
+            --primary-color: #0A245C;
+            /* Azul oscuro para elementos principales */
+            --secondary-color: #FF6600;
+            /* Naranja vibrante para acentos */
+            --text-light: #E8E9EC;
+            /* Blanco grisáceo para texto claro */
+            --text-dark: #333333;
+            /* Gris oscuro para texto principal */
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
+            --bg-gradient-start: #667eea;
+            --bg-gradient-end: #764ba2;
+            --font-family: 'Poppins', sans-serif;
+            --card-bg: #ffffff;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- Base --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+
+            font-family: var(--font-family);
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            min-height: 100vh;
+            color: var(--text-dark);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background-image: url('https://source.unsplash.com/random/1600x900?motorcycle,race');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .all-content {
+            width: 100%;
+            margin: auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- Navbar --- */
+        .navbar {
+            background-color: var(--primary-color);
+            padding: 15px 0;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .announcement-bar {
+            background-color: var(--secondary-color);
+            color: var(--text-light);
+            padding: 8px 15px;
+            width: 100%;
+            text-align: center;
+            font-size: 0.95em;
+            font-weight: 500;
+            border-radius: 5px;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+
+        .nav-btn {
+
+
+
+            padding: 12px 25px;
+            border: none;
+            border-radius: 30px;
+            background-color: transparent;
+            color: var(--text-light);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); */
+        }
+
+        .nav-btn.active-nav {
+            background: linear-gradient(45deg, var(--secondary-color), #f58428);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 102, 0, 0.6);
+            border: 2px solid var(--text-light);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            /* box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3); */
+            background: linear-gradient(45deg, var(--secondary-color), #dd843a);
+        }
+
+        .nav-btn .bi {
+            font-size: 1.1em;
+        }
+
+        /* --- Pantallas --- */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            min-height: 100vh;
+            /* Ocupa al menos la altura de la ventana */
+            /* padding-top: 120px; */
+            /* Espacio para la navbar pegada */
+            opacity: 0;
+            transform: translateX(100%);
+            transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.6s ease-in-out;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.9);
+            /* Fondo semi-transparente para las pantallas */
+        }
+
+        .screen.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+            position: relative;
+            /* Ajusta a relative cuando está activo para flujo normal */
+        }
+
+        /* Botón de regreso flotante en pantallas secundarias */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            cursor: pointer;
+            z-index: 101;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+
+        /* --- Pantalla Principal --- */
+        .main-content,
+        .tickets-section {
+            position: relative;
+            background: var(--card-bg);
+            border-radius: 20px;
+            margin: 30px auto;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .header-section {
+            background-color: var(--primary-color);
+            padding: 50px 30px;
+            text-align: center;
+            color: var(--text-light);
+            position: relative;
+        }
+
+        .header-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(10, 36, 92, 0.8) 0%, rgba(10, 36, 92, 0.95) 100%);
+            z-index: 1;
+        }
+
+        .header-section>* {
+            position: relative;
+            z-index: 2;
+        }
+
+        .capibara-icon img {
+            max-width: 300px;
+            /* height: auto; */
+            margin-bottom: 20px;
+            animation: bounce 2s infinite ease-in-out ;
+        
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+                
+            }
+
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+
+        .header-title {
+            /* background-color: #ffffff; */
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            text-shadow: 3px 3px rgb(255, 251, 251);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .header-subtitle {
+            font-size: 1.4rem;
+            opacity: 0.95;
+            color: var(--text-light);
+            font-weight: 300;
+        }
+
+        .form-section {
+            padding: 40px;
+            background-color: var(--primary-color);
+            /* Fondo oscuro para el formulario */
+            color: var(--text-light);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 1.1em;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #5a759e1e;
+            /* Borde más oscuro */
+            border-radius: 10px;
+            font-size: 1em;
+            background-color: #f0f2f5;
+            /* Fondo claro para inputs */
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #5a759e1e;
+            /* Borde más oscuro */
+            border-radius: 10px;
+            font-size: 1em;
+            background-color: #f0f2f5;
+            /* Fondo claro para inputs */
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.3);
+            /* Resplandor al enfocar */
+        }
+
+        /* ESTILO PARA EL INPUT TYPE FILE */
+        .form-group input[type="file"] {
+            padding: 15px 10px;
+            background-color: var(--text-light);
+            /* Color claro */
+            /* border: 2px dashed var(--secondary-color); */
+            /* Borde punteado para destacar */
+            cursor: pointer;
+        }
+
+        .checkbox-group {
+
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95em;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+
+            width: 20px;
+            height: 20px;
+
+            accent-color: var(--secondary-color);
+            /* Color de la casilla al marcar */
+        }
+
+        .payment-section {
+            background: #f8f9fa;
+            padding: 40px;
+            margin: 0;
+            /* Ajusta el margen si está dentro de main-content */
+            border-radius: 0 0 20px 20px;
+            /* Solo abajo si es la última sección */
+            text-align: center;
+        }
+
+        .payment-title {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .cost-display {
+            font-size: 3.5rem;
+            color: var(--secondary-color);
+            font-weight: 800;
+            margin-bottom: 25px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .payment-message {
+            font-size: 1.3rem;
+            color: #666;
+            margin-bottom: 35px;
+        }
+
+        .qr-codes {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .qr-item {
+            text-align: center;
+        }
+
+        /* .qr-code .qr-item > img {
+             width: 180px;
+            height: 180px;
+            border-radius: 10px;
+            border: 3px solid var(--primary-color);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            object-fit: contain;
+            text-align: center;
+        } */
+
+        .qr-code {
+            width: 180px;
+            height: 180px;
+            border-radius: 10px;
+            border: 3px solid var(--primary-color);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            object-fit: contain;
+
+        }
+
+        .qr-label {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-top: 10px;
+            font-size: 1.1em;
+        }
+
+        .company-info {
+            background: #e9ecef;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 30px auto;
+            font-size: 1.1em;
+            color: #555;
+            border-left: 5px solid var(--secondary-color);
+            text-align: left;
+            max-width: 400px;
+        }
+
+        .company-info strong {
+            color: var(--primary-color);
+        }
+
+        .upload-btn {
+            background: linear-gradient(45deg, var(--success-color), #27ae60);
+            color: white;
+            padding: 22px 45px;
+            border: none;
+            border-radius: 35px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 25px;
+            box-shadow: 0 6px 15px rgba(46, 204, 113, 0.4);
+            letter-spacing: 0.5px;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 12px 25px rgba(46, 204, 113, 0.5);
+            background: linear-gradient(45deg, #27ae60, var(--success-color));
+        }
+
+        /* --- Footer --- */
+        .footer {
+
+            background: var(--primary-color);
+            color: var(--text-light);
+            padding: 40px 0;
+            text-align: center;
+            box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.2);
+            margin-top: auto;
+
+            /* Empuja el footer hacia abajo */
+        }
+
+        #countdown {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--secondary-color);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .countdown-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+            min-width: 70px;
+        }
+
+        .countdown-item span {
+            font-size: 1.8em;
+            color: var(--secondary-color);
+            line-height: 1;
+        }
+
+        .countdown-item div {
+            font-size: 0.7em;
+            text-transform: uppercase;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .social-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 30px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .social-btn.tiktok {
+            background: #000;
+        }
+
+        .social-btn.facebook {
+            background: #3b5998;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .legal-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 0.9em;
+        }
+
+        .legal-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .legal-links a:hover {
+            color: var(--secondary-color);
+        }
+
+        /* --- Pantalla de Premios --- */
+        .prizes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            padding: 40px 20px;
+            width: 100%;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .prize-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: left;
+        }
+
+        .prize-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .prize-image {
+            height: 220px;
+            background-color: #f0f2f5;
+            /* Fondo neutral */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            /* Para los emojis si no hay imagen */
+            color: #999;
+            overflow: hidden;
+            /* Asegura que la imagen no sobresalga */
+        }
+
+        .prize-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Ajusta la imagen para cubrir el área */
+            display: block;
+        }
+
+        .prize-info {
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            /* Espacio para el nuevo botón */
+        }
+
+        .prize-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0;
+        }
+
+        .prize-value {
+            color: var(--secondary-color);
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        /* Estilo para el botón de compra en la tarjeta de premios (usa color secundario) */
+        .buy-ticket-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 30px;
+            background: linear-gradient(45deg, var(--secondary-color), #f58428);
+            color: var(--text-light);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: auto;
+            /* Empuja el botón al final */
+        }
+
+        .buy-ticket-btn:hover {
+            background: linear-gradient(45deg, #dd843a, var(--secondary-color));
+        }
+
+        /* --- Pantalla Mis Tickets --- */
+        .tickets-section {
+            padding: 60px 40px;
+            color: var(--text-dark);
+        }
+
+        .tickets-title {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        .tickets-section p {
+            font-size: 1.2em;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .consultation-form {
+            max-width: 450px;
+            margin: 0 auto;
+        }
+
+        .consult-btn {
+            background: linear-gradient(45deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: white;
+            padding: 18px 35px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .consult-btn:hover {
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        #consultResults {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e9f7ef;
+            /* Fondo más suave para resultados */
+            border-radius: 10px;
+            color: var(--primary-color);
+            border: 1px solid #d4edda;
+            text-align: left;
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: inset 0 0 8px rgba(0, 128, 0, 0.1);
+        }
+
+        #consultResults p {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .ticket-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+        }
+
+        .ticket-list li {
+            background-color: #f3fdf6;
+            border-left: 4px solid var(--success-color);
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+
+        .ticket-list li .icon {
+            font-size: 1.2em;
+            margin-left: 10px;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-weight: 600;
+        }
+
+        /* --- Mensajes Flotantes (Popup) --- */
+        .message-popup {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 0.5s ease-in-out, bottom 0.5s ease-in-out;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .message-popup.success {
+            background-color: rgba(40, 167, 69, 0.95);
+        }
+
+        .message-popup.error {
+            background-color: rgba(231, 76, 60, 0.95);
+        }
+
+        .message-popup.info {
+            background-color: rgba(52, 152, 219, 0.95);
+        }
+
+        .message-popup.hide {
+            opacity: 0;
+            bottom: 0px;
+            /* Desliza hacia abajo al ocultarse */
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .nav-content {
+                gap: 8px;
+            }
+
+            .nav-buttons {
+
+
+                gap: 10px;
+                /* width: 90%; */
+            }
+
+            .nav-btn {
+                padding: 10px 20px;
+                font-size: 0.5em;
+            }
+
+            .header-title {
+                font-size: 2.5rem;
+            }
+
+            .header-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cost-display {
+                font-size: 3rem;
+            }
+
+            .payment-message {
+                font-size: 1.1rem;
+            }
+
+            .qr-codes {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+
+            .upload-btn {
+                padding: 18px 30px;
+                font-size: 1.1rem;
+            }
+
+            .prizes-grid {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+
+            .prize-title {
+                font-size: 1.3rem;
+            }
+
+            .prize-value {
+                font-size: 1.1rem;
+            }
+
+            .tickets-title {
+                font-size: 2.2rem;
+            }
+
+            #countdown {
+                font-size: 1.5em;
+                gap: 15px;
+            }
+
+            .countdown-item {
+                padding: 8px 10px;
+                min-width: 60px;
+            }
+
+            .countdown-item span {
+                font-size: 1.5em;
+            }
+
+            .countdown-item div {
+                font-size: 0.6em;
+            }
+
+            .back-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1.3em;
+                top: 15px;
+                left: 15px;
+            }
+
+            .social-links {
+                flex-direction: column;
+            }
+        }
+
+        .after {
+            display: none;
+            cursor: no-drop;
+            background-color: #000000b6;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            /* Asegura que cubra toda la pantalla */
+            left: 0;
+            font-size: 40px;
+            z-index: 999;
+            color: #bbb;
+            padding: 50px;
+            text-align: center;
+            overflow: hidden;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lineTicket {
+
+            width: 100%;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+
+        }
+
+        #comprobante::file-selector-button {
+            background-color: #0A245C;
+            display: none;
+
+
+
+        }
+
+        .anuncios {
+            max-width: 250px;
+            border: 1px solid #333;
+            background-color: #E8E9EC;
+            padding: 10px;
+            position: fixed;
+            bottom: 40px;
+            left: 10px;
+        }
+
+        .anuncios .img {
+            width: 100%;
+        }
+        .anuncios iframe {
+            height: 200px;
+            width: 100%;
+        }
+
+        .flex-anuncio {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .flex-anuncio .closse {
+            width: 100%;
+            max-width: 30px;
+            display:flex;
+            align-items: center;
+            justify-content: center;
+            height: 30px;
+            cursor: pointer;
+           
+        }
+
+        .flex-anuncio .closse:hover {
+            background-color: #0000004f;
+        }
+        .anuncio-modal-container{
+          
+            border: none;
+            background-color: transparent;
+          
+        }
+    </style>
+</head>
+
+
+
+<body>
+
+
+    <button class="back-btn" style="display: none;"><i class="bi bi-arrow-left"></i></button>
+
+    <header class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="announcement-bar">
+                    <marquee behavior="" direction="">🎉 ¡El sorteo se realizará el miercoles 31 de diciembre a las 3:00
+                        p.m. y se transmitirá por
+                        nuestra página oficial de Facebook: Importaciones Davicross! 🎉</marquee>
+                </div>
+                <nav class="nav-buttons">
+                    <button id="prizes-nav-btn" class="nav-btn" onclick="showScreen('prizes', this)">
+                        <i class="bi bi-trophy-fill"></i> Ver premios
+                    </button>
+                    <button id="tickets-nav-btn" class="nav-btn" onclick="showScreen('tickets', this)">
+                        <i class="bi bi-ticket-fill"></i> Mis tickets
+                    </button>
+                    <button id="whatsapp-btn" class="nav-btn"
+                        onclick="window.location.href='https://wa.me/51999888777'">
+                        <i class="bi bi-whatsapp"></i> Contáctanos
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="all-content">
+        <section id="main" class="screen active">
+            <div class="container">
+                <div class="main-content">
+                    <div class="header-section">
+                        <div class="capibara-icon">
+                            <img class="icon_logo_principal" src="/images/imagen-catalogo-removebg-preview.png"
+                                alt="Logo animado de Capibara">
+                        </div>
+                        <h1 class="header-title">¡REGÍSTRATE AQUÍ!</h1>
+                        <p class="header-subtitle">Participa en nuestro increíble sorteo por una ¡SUPER MOTO!</p>
+                    </div>
+
+                    <div class="form-section">
+                        <form id="registrationForm" onsubmit="return handleRegistrationAndUpload(event)">
+                            <div class="form-grid">
+                                <div>
+                                    <div class="form-group">
+                                        <label for="dni">DNI / C. de Extranjería</label>
+                                        <input type="text" id="dni" name="dni" placeholder="Ingresa tu documento"
+                                            required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="nombres">Nombres</label>
+                                        <input type="text" id="nombres" name="nombres" placeholder="Tus nombres"
+                                            required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="apellidos">Apellidos</label>
+                                        <input type="text" id="apellidos" name="apellidos" placeholder="Tus apellidos"
+                                            required>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="form-group">
+                                        <label for="whatsapp-register">Número de WhatsApp</label>
+                                        <input type="tel" id="whatsapp-register" name="whatsapp"
+                                            placeholder="+51 999 999 999" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="departamento">Departamento</label>
+                                        <select id="departamento" name="departamento" required>
+                                            <option value="">Selecciona tu departamento</option>
+                                            <option value="Lima">Lima</option>
+                                            <option value="Arequipa">Arequipa</option>
+                                            <option value="Cusco">Cusco</option>
+                                            <option value="La Libertad">La Libertad</option>
+                                            <option value="Piura">Piura</option>
+                                            <option value="Junín">Junín</option>
+                                            <option value="Lambayeque">Lambayeque</option>
+                                            <option value="Cajamarca">Cajamarca</option>
+                                            <option value="Tumbes">Tumbes</option>
+                                            <option value="Tacna">Tacna</option>
+                                            <option value="Huancayo">Huancayo</option>
+                                            <option value="Huanuco">Huanuco</option>
+                                            <option value="Ayacucho">Ayacucho</option>
+                                            <option value="Amazonas">Amazonas</option>
+                                            <option value="Ucayali">Ucayali</option>
+                                            <option value="Puno">Puno</option>
+                                            <option value="Ica">Ica</option>
+                                            <option value="Ancash">Ancash</option>
+                                            <option value="Loreto">Loreto</option>
+                                            <option value="Madre de Dios">Madre de Dios</option>
+                                            <option value="Apurimac">Apurimac</option>
+                                            <option value="Pasco">Pasco</option>
+                                            <option value="Moquegua">Moquegua</option>
+                                            <option value="San Martin">San Martin</option>
+                                            <option value="Huancavelica">Huancavelica</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="comprobante">Adjuntar Comprobante de Pago</label>
+                                        <input type="file" id="comprobante" name="comprobante"
+                                            accept="image/*, application/pdf" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="checkbox-group">
+                                            <input type="checkbox" id="terms" required>
+                                            <label for="terms">Acepto <a href="#"
+                                                    style="color:var(--secondary-color);">términos y
+                                                    condiciones</a></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="payment-section">
+                                <h2 class="payment-title">Costo del Ticket</h2>
+                                <div class="cost-display">S/ 50.00</div>
+                                <p class="payment-message">¡Si aún no has realizado tu pago, puedes hacerlo ahora!</p>
+                                <div class="qr-codes">
+                                    <div class="qr-item">
+                                        <img src="https://suministrosperu.com/wp-content/uploads/2016/01/YAPE-QR.png"
+                                            alt="Código QR de Yape" class="qr-code">
+                                        <div class="qr-label">Yape</div>
+                                    </div>
+                                    <div class="qr-item">
+                                        <img src="https://suministrosperu.com/wp-content/uploads/2016/01/YAPE-QR.png"
+                                            alt="Código QR de Plin" class="qr-code">
+                                        <div class="qr-label">Plin</div>
+                                    </div>
+                                </div>
+                                <div class="company-info">
+                                    <strong>Importaciones Davicross S.A.C</strong><br>
+                                    📞 Contacto: +51 999 888 777<br>
+                                    RUC: 20739903672
+                                </div>
+                                <button type="submit" class="upload-btn">
+                                    <i class="bi bi-upload"></i> SUBIR COMPROBANTE Y REGISTRAR
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="prizes" class="screen">
+            <div class="container">
+                <div class="main-content">
+                    <div class="header-section">
+                        <h2 class="header-title"><i class="bi bi-trophy-fill"></i> PREMIOS INCREÍBLES</h2>
+                        <p class="header-subtitle">¡Mira lo que puedes ganar en nuestro sorteo!</p>
+                    </div>
+                    <div class="prizes-grid">
+                        <div class="prize-card">
+                            <div class="prize-image">
+                                <img src="https://i.ytimg.com/vi/t_cepBoA3vQ/maxresdefault.jpg"
+                                    alt="Premio Casa de 3 habitaciones">
+
+                            </div>
+                            <div class="prize-info">
+                                <h3 class="prize-title">Casa de 3 habitaciones</h3>
+                                <p class="prize-value">Valor: S/ 350,000</p>
+                                <button class="buy-ticket-btn" onclick="navigateTo('main')">
+                                    <i class="bi bi-cart-fill"></i> Comprar Ticket
+                                </button>
+                            </div>
+                        </div>
+                        <div class="prize-card">
+                            <div class="prize-image">
+                                <img src="https://www.toyotaperu.com.pe/sites/default/files/360/avanza22_blancow09_00.jpg"
+                                    alt="Premio Automóvil Toyota">
+                            </div>
+                            <div class="prize-info">
+                                <h3 class="prize-title">Automóvil Toyota Yaris</h3>
+                                <p class="prize-value">Valor: S/ 80,000</p>
+                                <button class="buy-ticket-btn" onclick="navigateTo('main')">
+                                    <i class="bi bi-cart-fill"></i> Comprar Ticket
+                                </button>
+                            </div>
+                        </div>
+                        <div class="prize-card">
+                            <div class="prize-image">
+                                <img src="https://www.yamaha-motor.com.pe/file/v4685047748609769303/general/bloque01_r15_abs_peru.jpg"
+                                    alt="Premio Motocicleta Yamaha">
+                            </div>
+                            <div class="prize-info">
+                                <h3 class="prize-title">Motocicleta Yamaha R15</h3>
+                                <p class="prize-value">Valor: S/ 12,000</p>
+                                <button class="buy-ticket-btn" onclick="navigateTo('main')">
+                                    <i class="bi bi-cart-fill"></i> Comprar Ticket
+                                </button>
+                            </div>
+                        </div>
+                        <div class="prize-card">
+                            <div class="prize-image">
+                                <img src="https://static8.depositphotos.com/1006899/896/i/450/depositphotos_8961765-stock-photo-prize.jpg"
+                                    alt="Premio Dinero en efectivo">
+                            </div>
+                            <div class="prize-info">
+                                <h3 class="prize-title">Premio en efectivo</h3>
+                                <p class="prize-value">Valor: S/ 25,000</p>
+                                <button class="buy-ticket-btn" onclick="navigateTo('main')">
+                                    <i class="bi bi-cart-fill"></i> Comprar Ticket
+                                </button>
+                            </div>
+                        </div>
+                        <div class="prize-card">
+                            <div class="prize-image">
+                                <img src="https://market-resized.envatousercontent.com/previews/files/460537976/590.jpg?w=590&h=590&cf_fit=crop&crop=top&format=auto&q=85&s=9768beaa32033d61611eb94d42e6192b5b2fdf0005123a057f52ec37c0bde78b"
+                                    alt="Premio iPhone 15 Pro Max">
+                            </div>
+                            <div class="prize-info">
+                                <h3 class="prize-title">iPhone 15 Pro Max</h3>
+                                <p class="prize-value">Valor: S/ 6,000</p>
+                                <button class="buy-ticket-btn" onclick="navigateTo('main')">
+                                    <i class="bi bi-cart-fill"></i> Comprar Ticket
+                                </button>
+                            </div>
+                        </div>
+                        <div class="prize-card">
+                            <div class="prize-image">
+                                <img src="https://www.shutterstock.com/image-photo/man-giving-dollar-banknotes-woman-600nw-2581188037.jpg"
+                                    alt="Premio Dinero en efectivo">
+                            </div>
+                            <div class="prize-info">
+                                <h3 class="prize-title">Tercer Premio</h3>
+                                <p class="prize-value">Valor: S/ 5,000</p>
+                                <button class="buy-ticket-btn" onclick="navigateTo('main')">
+                                    <i class="bi bi-cart-fill"></i> Comprar Ticket
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tickets" class="screen">
+            <div class="container">
+                <div class="main-content tickets-section">
+                    <h2 class="tickets-title"><i class="bi bi-ticket-fill"></i>MIS TICKETS</h2>
+                    <p>Ingresa tu DNI para ver los números de ticket que tienes asignados.</p>
+
+                    <div class="consultation-form">
+                        <div class="form-group">
+                            <label for="dni-consult">DNI / C. de Extranjería</label>
+                            <input type="text" id="dni-consult" placeholder="Ingresa tu documento" required>
+                        </div>
+                        <button class="consult-btn" onclick="consultTickets()">
+                            <i class="bi bi-search"></i> Consultar Tickets
+                        </button>
+
+                        <div id="consultResults" style="display:none;">
+                            <h4>Resultados para DNI: <span id="resultDni"></span></h4>
+                            <p id="resultName"></p>
+                            <p>Tus Tickets Adquiridos:</p>
+                            <ul class="ticket-list" id="ticketList">
+                                <!-- Aqui va la lista de tickets -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <div class="after" id="after-sorteo">
+            <p>¡Ups! El tiempo ha terminado. Gracias por participar.</p>
+        </div>
+
+
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <h3>Tiempo restante para el Sorteo</h3>
+            <div id="countdown">
+                <div class="countdown-item">
+                    <span id="days">00</span>
+                    <div>DÍAS</div>
+                </div>
+                <div class="countdown-item">
+                    <span id="hours">00</span>
+                    <div>HRS</div>
+                </div>
+                <div class="countdown-item">
+                    <span id="minutes">00</span>
+                    <div>MIN</div>
+                </div>
+                <div class="countdown-item">
+                    <span id="seconds">00</span>
+                    <div>SEG</div>
+                </div>
+            </div>
+            <div class="social-links">
+                <a href="https://www.tiktok.com/@tu_cuenta" target="_blank" class="social-btn tiktok">
+                    <i class="bi bi-tiktok"></i> TikTok
+                </a>
+                <a href="https://www.facebook.com/tu_pagina" target="_blank" class="social-btn facebook">
+                    <i class="bi bi-facebook"></i> Facebook
+                </a>
+            </div>
+            <p>&copy; 2026 Importaciones Davicross S.A.C. Todos los derechos reservados.</p>
+            <div class="legal-links">
+                <a href="#">Política de Privacidad</a> | <a href="#">Términos y Condiciones</a>
+            </div>
+        </div>
+    </footer>
+
+
+
+    <dialog id="modalAnuncio" class="anuncio-modal-container">
+        <div class="anuncios">
+            <div class="flex-anuncio">
+                <p>¡Este es un anuncio importante sobre el sorteo!</p>
+                <span class="closse" onclick="document.getElementById('modalAnuncio').close()">
+                    &times;
+                </span>
+            </div>
+            <!-- <iframe width="560" height="315" src="https://www.youtube.com/embed/LGRb3oI6wn0?si=MLAfIzOynplPrO_V&amp;controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe> -->
+            <img class=" img"   src="/images/imganimado.gif" alt="Imagen de Anuncio">
+        </div>
+    </dialog>
+   
+
+
+
+
+
+    <div id="popup-message" class="message-popup hide"></div>
+
+    <script>
+        // ---------------------------------------------------------------------------------------------------------
+        // ⚠️ TAREA DEL USUARIO: ENDPOINTS DE NODE.JS
+        // Si despliegas el backend, reemplaza 'http://localhost:3000' por 'https://tudominio.com'
+        // ---------------------------------------------------------------------------------------------------------
+        const BACKEND_API_URL = 'http://localhost:3000/api/register';
+        const TICKETS_API_URL = 'http://localhost:3000/api/tickets';
+        // ---------------------------------------------------------------------------------------------------------
+
+
+        const screens = document.querySelectorAll('.screen');
+        const navButtons = document.querySelectorAll('.nav-btn');
+        const backBtn = document.querySelector('.back-btn');
+        let currentScreenId = 'main'; // Pantalla inicial
+
+
+        // ----------------------------------------------------
+        // FUNCIONES DE NAVEGACIÓN
+        // ----------------------------------------------------
+
+        function showScreen(id, targetButton = null) {
+            screens.forEach(screen => {
+                screen.classList.remove('active');
+            });
+
+            const targetScreen = document.getElementById(id);
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+                currentScreenId = id;
+            }
+
+            backBtn.style.display = id === 'main' ? 'none' : 'flex';
+
+            navButtons.forEach(btn => btn.classList.remove('active-nav'));
+
+            if (id === 'main') {
+                document.getElementById('prizes-nav-btn').classList.remove('active-nav');
+                document.getElementById('tickets-nav-btn').classList.remove('active-nav');
+            } else if (id === 'prizes') {
+                document.getElementById('prizes-nav-btn').classList.add('active-nav');
+            } else if (id === 'tickets') {
+                document.getElementById('tickets-nav-btn').classList.add('active-nav');
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function navigateTo(id) {
+            showScreen(id);
+        }
+
+        backBtn.addEventListener('click', () => {
+            showScreen('main');
+        });
+
+
+
+
+
+        async function handleRegistrationAndUpload(event) {
+            event.preventDefault();
+
+            // Usamos el objeto FormData del formulario HTML directamente para incluir el archivo y los campos
+            const form = document.getElementById('registrationForm');
+            const formData = new FormData(form);
+
+            // 1. Recolección y Validación de Datos (desde el formulario)
+            const dni = formData.get('dni');
+            const comprobanteFile = document.getElementById('comprobante').files[0];
+            const terminosAceptados = document.getElementById('terms').checked;
+
+            if (dni.length !== 8 || isNaN(dni)) {
+                showTemporaryMessage('⚠️ Por favor, ingresa un DNI de 8 dígitos.', 'error');
+                return false;
+            }
+            if (!comprobanteFile) {
+                showTemporaryMessage('⚠️ Debes adjuntar tu comprobante de pago.', 'error');
+                return false;
+            }
+            if (!terminosAceptados) {
+                showTemporaryMessage('⚠️ Debes aceptar los términos y condiciones.', 'error');
+                return false;
+            }
+
+            // El objeto FormData ya incluye todos los campos de texto y el archivo
+
+            showTemporaryMessage('⌛ Subiendo comprobante y registrando datos...', 'info');
+
+            const uploadButton = document.querySelector('.upload-btn');
+            uploadButton.disabled = true; // Deshabilitar el botón
+
+            try {
+                // 2. Envío al Backend usando Fetch
+                const BACKEND_API_URL = 'http://localhost:3000/api/register';
+
+                const response = await fetch(BACKEND_API_URL, {
+                    method: 'POST',
+                    body: formData // Envío directo de FormData (incluye todos los campos y el archivo)
+                });
+
+                const data = await response.json();
+                uploadButton.disabled = false;
+
+                if (response.ok && data.success) { // El servidor devuelve status 200 y success: true
+                    showTemporaryMessage(`✅ Registro exitoso. ¡Tu ticket es el N° ${data.ticket}!`, 'success');
+                    document.getElementById('registrationForm').reset();
+                } else {
+                    // Manejar errores de validación (status 400) o fallos lógicos del servidor
+                    showTemporaryMessage(`❌ Error en el registro: ${data.message || 'Error desconocido del servidor.'}`, 'error');
+                }
+
+            } catch (error) {
+                console.error('Error al enviar el formulario:', error);
+                uploadButton.disabled = false;
+                showTemporaryMessage('❌ Error de conexión con el servidor. Verifica la consola del navegador.', 'error');
+            }
+
+            return false;
+        }
+
+        // ----------------------------------------------------
+        // CONSULTA DE TICKETS (A PUNTO DE NODE.JS)
+        // ----------------------------------------------------
+
+        async function consultTickets() {
+            const dni = document.getElementById('dni-consult').value;
+            const resultsDiv = document.getElementById('consultResults');
+            const ticketList = document.getElementById('ticketList');
+
+            if (dni.length !== 8 || isNaN(dni)) {
+                showTemporaryMessage('⚠️ Por favor, ingresa un DNI válido de 8 dígitos.', 'error');
+                return;
+            }
+
+
+            resultsDiv.style.display = 'none';
+            ticketList.innerHTML = '';
+            showTemporaryMessage('⌛ Consultando datos en el servidor...', 'info');
+
+            try {
+                // Enviar la petición al servidor Node.js (ruta /api/tickets?dni=...)
+                const response = await fetch(`${TICKETS_API_URL}?dni=${dni}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('resultDni').textContent = dni;
+                    document.getElementById('resultName').textContent = `Participante: ${data.name || 'N/A'}`;
+                    const alt = document.querySelector('.p');
+
+
+
+                    if (data.tickets && data.tickets.length > 0) {
+                        data.tickets.forEach(ticket => {
+                            const li = document.createElement('li');
+                            li.className = 'text-p-ticket';
+                            li.innerHTML = `
+                                <div class="lineTicket">
+                                <div class="lineText">
+                                    <p>Numero de ticket: ${ticket}</p>
+                                    <span class="p" style="color: #33300088; font-size:10px; ">Estas participando en el sorteo de un(a)  <span />
+                                </div>
+                                <span class="icon bi bi-check-circle-fill" style="color: var(--success-color);"></span>
+
+                            </div>`;
+                            ticketList.appendChild(li);
+                        });
+                        showTemporaryMessage(`✅ ${data.tickets.length} ticket(s) encontrado(s) exitosamente.`, 'success');
+                    } else {
+                        const li = document.createElement('li');
+                        li.textContent = 'Aún no tienes tickets asignados.';
+                        ticketList.appendChild(li);
+                        showTemporaryMessage('⚠️ DNI registrado, pero sin tickets asignados.', 'error');
+                    }
+                    resultsDiv.style.display = 'block';
+
+                } else {
+                    // Manejo de error 404/400 del servidor
+                    document.getElementById('resultDni').textContent = dni;
+                    document.getElementById('resultName').textContent = 'Participante: No encontrado';
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span class="error-message">❌ ${data.message || 'Error en la consulta.'}</span>`;
+                    ticketList.appendChild(li);
+                    resultsDiv.style.display = 'block';
+                    showTemporaryMessage('⚠️ DNI no encontrado.', 'error');
+                }
+
+            } catch (error) {
+                console.error('Error al consultar:', error);
+                showTemporaryMessage('❌ Error de conexión con el servidor. Intenta de nuevo más tarde.', 'error');
+            }
+        }
+
+
+        // ----------------------------------------------------
+        // CONTADOR REGRESIVO 
+        // ----------------------------------------------------
+
+        const countdownDate = new Date("September 30, 2026 17:00:00").getTime();
+        const countdownElement = document.getElementById("countdown");
+        const afterOverlay = document.getElementById("after-sorteo");
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = countdownDate - now;
+
+            if (distance < 0) {
+                clearInterval(countdownInterval);
+                countdownElement.innerHTML = "¡SORTEO FINALIZADO!";
+                afterOverlay.style.display = 'flex';
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            const format = num => num < 10 ? "0" + num : num;
+
+            document.getElementById("days").innerText = format(days);
+            document.getElementById("hours").innerText = format(hours);
+            document.getElementById("minutes").innerText = format(minutes);
+            document.getElementById("seconds").innerText = format(seconds);
+        }
+
+        updateCountdown();
+        const countdownInterval = setInterval(updateCountdown, 1000);
+
+        // ----------------------------------------------------
+        // UTILERÍA: POPUP DE MENSAJES 
+        // ----------------------------------------------------
+        function showTemporaryMessage(message, type = 'info') {
+            const popup = document.getElementById('popup-message');
+            popup.textContent = message;
+            popup.className = `message-popup ${type}`;
+            popup.classList.remove('hide');
+
+            clearTimeout(popup.timeoutId);
+            popup.timeoutId = setTimeout(() => {
+                popup.classList.add('hide');
+            }, 4000);
+        }
+        document.addEventListener('DOMContentLoaded', (event) => {
+            // Retrasamos la aparición 500ms (medio segundo) para que la página cargue bien
+            setTimeout(() => {
+                const modal = document.getElementById('modalAnuncio');
+                if (modal) {
+                    modal.showModal();
+                }
+            }, 500);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            showScreen('main');
+        });
+
+
+    </script>
+
+</body>
+
+</html>

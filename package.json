@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "mongodb": "^6.20.0",
+    "mongoose": "^8.18.2",
+    "multer": "^2.0.2",
+    "uuid": "^13.0.0"
+  },
+  "name": "sorteo-project",
+  "version": "1.0.0",
+  "description": "Backend para el registro y consulta de tickets de sorteo con Node.js",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Importaciones Davicross",
+  "license": "MIT"
+}

@@ -153,7 +153,7 @@ app.get('/api/tickets', async (req, res) => { // <-- Hacer la función async
 
 // Iniciar Servidor
 app.listen(PORT, () => {
-    console.log(`🚀 Servidor Node.js corriendo en http://localhost:${PORT}`);
+    console.log(`🚀 Servidor Node.js corriendo en http://localhost:3000:${PORT}`);
     console.log('🔗 Endpoints disponibles:');
     console.log(`   - POST: ${app.get('env') === 'development' ? 'http://localhost:3000' : 'https://tudominio.com'}/api/register`);
     console.log(`   - GET:  ${app.get('env') === 'development' ? 'http://localhost:3000' : 'https://tudominio.com'}/api/tickets?dni=...`);

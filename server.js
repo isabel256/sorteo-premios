@@ -12,11 +12,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const DB_URI = process.env.DB_URI;
 
-mongoose.connect(DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(DB_URI)
   .then(() => console.log("✅ Conexión exitosa a MongoDB"))
   .catch(err => console.error("❌ Error al conectar a MongoDB:", err));
-
-
 // ----------------------------------------------------------------------------------
 // Lógica para el número de ticket (ahora se obtiene desde la DB)
 // ----------------------------------------------------------------------------------

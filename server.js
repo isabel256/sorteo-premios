@@ -73,7 +73,7 @@ app.use(cors({
     methods: ['GET', 'POST']
 }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.get('*', (req, res) => {
+app.get(/^\/(?!api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'sorteo_de_premios.html'));
 });
 

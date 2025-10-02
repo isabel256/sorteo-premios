@@ -156,8 +156,9 @@ app.get('/api/tickets', async (req, res) => { // <-- Hacer la función async
 // Iniciar Servidor
 app.listen(PORT, () => {
   console.log(`🚀 Servidor Node.js corriendo en el puerto ${PORT}`);
-  console.log('🔗 Endpoints disponibles:');
+  console.log(`🔗 Endpoints disponibles:`);
   console.log(`   - POST: /api/register`);
   console.log(`   - GET:  /api/tickets?dni=...`);
-  console.log(`🌐 En producción accede con la URL de Render: https://sorteo-premios.onrender.com/`);
+  console.log(`🌐 En producción: https://sorteo-premios.onrender.com`);
 });
+

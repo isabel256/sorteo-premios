@@ -234,10 +234,22 @@
             position: relative;
             z-index: 2;
         }
+        .capibara-icon{
+            background-image: url(/images/princip-logo.png);
+            background-position: center;
+            background-size: cover;
+            /* background-color: #000; */
+            position: relative;
+            z-index: 999;
+            height: 80px;
+            max-width: 800px;
+            animation: bounce 2s infinite ease-in-out ;
+        
+        }
 
         .capibara-icon img {
-            max-width: 300px;
-            /* height: auto; */
+            
+            width: 100%;
             margin-bottom: 20px;
             animation: bounce 2s infinite ease-in-out ;
         
@@ -1011,8 +1023,8 @@
                 <div class="main-content">
                     <div class="header-section">
                         <div class="capibara-icon">
-                            <img class="icon_logo_principal" src="/images/imagen-catalogo-removebg-preview.png"
-                                alt="Logo animado de Capibara">
+                            <!-- <img class="icon_logo_principal" src=""
+                                alt="Logo animado de Capibara"> -->
                         </div>
                         <h1 class="header-title">¡REGÍSTRATE AQUÍ!</h1>
                         <p class="header-subtitle">Participa en nuestro increíble sorteo por una ¡SUPER MOTO!</p>
@@ -1309,13 +1321,11 @@
     <div id="popup-message" class="message-popup hide"></div>
 
     <script>
-        // ---------------------------------------------------------------------------------------------------------
-        // ⚠️ TAREA DEL USUARIO: ENDPOINTS DE NODE.JS
-        // Si despliegas el backend, reemplaza 'http://localhost:3000' por 'https://tudominio.com'
-        // ---------------------------------------------------------------------------------------------------------
-        const BACKEND_API_URL = 'http://localhost:3000/api/register';
-        const TICKETS_API_URL = 'http://localhost:3000/api/tickets';
-        // ---------------------------------------------------------------------------------------------------------
+       
+      
+        const BACKEND_API_URL = 'https://sorteo-premios.onrender.com/api/register';
+        const TICKETS_API_URL = 'https://sorteo-premios.onrender.com/api/tickets';
+      
 
 
         const screens = document.querySelectorAll('.screen');
@@ -1324,10 +1334,7 @@
         let currentScreenId = 'main'; // Pantalla inicial
 
 
-        // ----------------------------------------------------
-        // FUNCIONES DE NAVEGACIÓN
-        // ----------------------------------------------------
-
+      
         function showScreen(id, targetButton = null) {
             screens.forEach(screen => {
                 screen.classList.remove('active');
@@ -1401,7 +1408,7 @@
 
             try {
                 // 2. Envío al Backend usando Fetch
-                const BACKEND_API_URL = 'http://localhost:3000/api/register';
+                const BACKEND_API_URL = 'https://sorteo-premios.onrender.com/api/register';
 
                 const response = await fetch(BACKEND_API_URL, {
                     method: 'POST',

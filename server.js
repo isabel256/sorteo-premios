@@ -69,7 +69,7 @@ const upload = multer({
 // ------------------------------------------------
 // Permite peticiones desde el frontend (puerto 80/443 por defecto)
 app.use(cors({
-    origin: '*', // ⚠️ EN PRODUCCIÓN, CAMBIA ESTO POR LA URL DE TU DOMINIO
+    origin: 'https://sorteo-premios.onrender.com', // ⚠️ EN PRODUCCIÓN, CAMBIA ESTO POR LA URL DE TU DOMINIO
     methods: ['GET', 'POST']
 }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -154,8 +154,9 @@ app.get('/api/tickets', async (req, res) => { // <-- Hacer la función async
 
 // Iniciar Servidor
 app.listen(PORT, () => {
-    console.log(`🚀 Servidor Node.js corriendo en http://localhost:3000:${PORT}`);
-    console.log('🔗 Endpoints disponibles:');
-    console.log(`   - POST: ${app.get('env') === 'development' ? 'http://localhost:3000' : 'https://tudominio.com'}/api/register`);
-    console.log(`   - GET:  ${app.get('env') === 'development' ? 'http://localhost:3000' : 'https://tudominio.com'}/api/tickets?dni=...`);
+  console.log(`🚀 Servidor Node.js corriendo en el puerto ${PORT}`);
+  console.log('🔗 Endpoints disponibles:');
+  console.log(`   - POST: /api/register`);
+  console.log(`   - GET:  /api/tickets?dni=...`);
+  console.log(`🌐 En producción accede con la URL de Render: https://tu-servicio.onrender.com`);
 });

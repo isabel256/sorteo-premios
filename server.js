@@ -67,9 +67,12 @@ const upload = multer({
 // ------------------------------------------------
 // Permite peticiones desde el frontend (puerto 80/443 por defecto)
 app.use(cors({
-    origin: 'https://sorteo-premios.onrender.com', // ⚠️ EN PRODUCCIÓN, CAMBIA ESTO POR LA URL DE TU DOMINIO
-    methods: ['GET', 'POST']
+  origin: process.env.NODE_ENV === 'production'
+    ? 'https://sorteo-premios.onrender.com'
+    : '*',
+  methods: ['GET', 'POST']
 }));
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.get(/^\/(?!api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'sorteo_de_premios.html'));
@@ -156,5 +159,5 @@ app.listen(PORT, () => {
   console.log('🔗 Endpoints disponibles:');
   console.log(`   - POST: /api/register`);
   console.log(`   - GET:  /api/tickets?dni=...`);
-  console.log(`🌐 En producción accede con la URL de Render: https://tu-servicio.onrender.com`);
+  console.log(`🌐 En producción accede con la URL de Render: https://sorteo-premios.onrender.com/`);
 });

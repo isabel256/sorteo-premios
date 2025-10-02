@@ -6,20 +6,16 @@ const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 const mongoose = require('mongoose'); // <-- NUEVO: Para MongoDB
 const Registro = require('./models/registro'); // <-- NUEVO: Importa el modelo
+require('dotenv').config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+const DB_URI = process.env.DB_URI;
 
-
-
-// ----------------------------------------------------------------------------------
-// 🚀 CONEXIÓN A LA BASE DE DATOS REAL (MongoDB)
-// ----------------------------------------------------------------------------------
-// const DB_URI = 'mongodb://localhost:27017/sorteoDB'; // <-- CAMBIA ESTO por tu URL de MongoDB Atlas si despliegas
-const DB_URI = 'mongodb+srv://admin_db:1234@cluster0.exgbbb9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
 mongoose.connect(DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log('✅ Conexión exitosa a MongoDB'))
-    .catch(err => console.error('❌ Error de conexión a MongoDB:', err));
+  .then(() => console.log("✅ Conexión exitosa a MongoDB"))
+  .catch(err => console.error("❌ Error al conectar a MongoDB:", err));
+
 
 // ----------------------------------------------------------------------------------
 // Lógica para el número de ticket (ahora se obtiene desde la DB)
@@ -76,6 +72,11 @@ app.use(cors({
     origin: '*', // ⚠️ EN PRODUCCIÓN, CAMBIA ESTO POR LA URL DE TU DOMINIO
     methods: ['GET', 'POST']
 }));
+app.use(express.static(path.join(__dirname, 'public')));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'sorteo_de_premios.html'));
+});
+
 app.use(express.json());
 app.use('/comprobantes', express.static(UPLOADS_DIR)); // Para servir los archivos subidos (opcional)
 

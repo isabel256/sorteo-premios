@@ -13,14 +13,25 @@ const PORT = process.env.PORT || 3000;
 const DB_URI = process.env.DB_URI;
 // server.js (Parte superior, después de los require)
 
+
 const vision = require('@google-cloud/vision');
-// El cliente se autentica automáticamente usando la clave JSON de GOOGLE_APPLICATION_CREDENTIALS
-const client = new vision.ImageAnnotatorClient();
+
+let client;
+
+if (process.env.GOOGLE_CREDENTIALS_JSON) {
+    // Para producción (Render): usa el JSON pegado directamente en la variable segura
+    client = new vision.ImageAnnotatorClient({
+        credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON)
+    });
+} else {
+    // Para desarrollo local: usa el archivo local (GOOGLE_APPLICATION_CREDENTIALS)
+    client = new vision.ImageAnnotatorClient();
+}
 
 mongoose.connect(DB_URI)
     .then(() => console.log("✅ Conexión exitosa a MongoDB"))
     .catch(err => console.error("❌ Error al conectar a MongoDB:", err));
-    
+
 // Lógica para el número de ticket (ahora se obtiene desde la DB)
 async function getNextTicketNumber() {
     const ultimoRegistro = await Registro.findOne().sort({ ticket: -1 });
@@ -42,23 +53,23 @@ async function validateComprobanteWithOCR(filePath) {
     try {
         const [result] = await client.textDetection(filePath);
         const fullText = result.fullTextAnnotation ? result.fullTextAnnotation.text : '';
-        
+
         if (!fullText) return false;
-        
+
         const textUpper = fullText.toUpperCase();
-        
+
         // Criterios de Validación (Monto S/ 50.00 y Beneficiario Davicross)
         const requiredAmount = '50.00';
-        const companyKeywords = ['DAVICROSS', '20739903672', 'S.A.C']; 
-        
-        const amountCheck = textUpper.includes(requiredAmount) || textUpper.includes('S/50') || textUpper.includes('S. 50'); 
+        const companyKeywords = ['DAVICROSS', '20739903672', 'S.A.C'];
+
+        const amountCheck = textUpper.includes(requiredAmount) || textUpper.includes('S/50') || textUpper.includes('S. 50');
         const companyCheck = companyKeywords.some(keyword => textUpper.includes(keyword));
 
         return amountCheck && companyCheck;
 
     } catch (error) {
         console.error('Error al procesar el comprobante con Google Vision:', error);
-        return false; 
+        return false;
     }
 }
 
@@ -109,36 +120,36 @@ app.use('/comprobantes', express.static(UPLOADS_DIR)); // Para servir los archiv
 // server.js (Modifica la ruta existente app.post('/api/register', ...)
 
 app.post('/api/register', upload.single('comprobante'), async (req, res) => {
-    
+
     const file = req.file;
     if (!file) {
         return res.status(400).json({ success: false, message: 'Falta el comprobante de pago.' });
     }
 
     try {
-        
+
         // 🚨 PASO DE VALIDACIÓN OCR 🚨
         const isValid = await validateComprobanteWithOCR(file.path);
 
         if (!isValid) {
             // Si la validación falla, BORRAMOS el archivo subido
-            fs.unlinkSync(file.path); 
-            return res.status(400).json({ 
-                success: false, 
-                message: 'El comprobante no pudo ser verificado. Confirme que sea de S/ 50.00 a Davicross.' 
+            fs.unlinkSync(file.path);
+            return res.status(400).json({
+                success: false,
+                message: 'El comprobante no pudo ser verificado. Confirme que sea de S/ 50.00 a Davicross.'
             });
         }
 
         // Si es válido, continuamos el proceso normal:
-        const ticketId = await getNextTicketNumber(); 
-        
+        const ticketId = await getNextTicketNumber();
+
         const nuevoRegistro = new Registro({
             ...req.body,
             ticket: ticketId,
             comprobantePath: file.path // Solo guardamos la ruta si fue validado
         });
 
-        await nuevoRegistro.save(); 
+        await nuevoRegistro.save();
 
         res.json({ success: true, message: '¡Registro y comprobante verificados exitosamente!', ticket: ticketId });
 
@@ -146,7 +157,7 @@ app.post('/api/register', upload.single('comprobante'), async (req, res) => {
         console.error('Error durante el registro o OCR:', error);
         // Manejo de error: Asegúrate de limpiar el archivo ante cualquier fallo
         if (file && fs.existsSync(file.path)) {
-             fs.unlinkSync(file.path); 
+            fs.unlinkSync(file.path);
         }
         res.status(500).json({ success: false, message: 'Error interno del servidor.' });
     }

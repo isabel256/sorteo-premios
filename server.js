@@ -11,32 +11,57 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 const DB_URI = process.env.DB_URI;
+// server.js (Parte superior, después de los require)
+
+const vision = require('@google-cloud/vision');
+// El cliente se autentica automáticamente usando la clave JSON de GOOGLE_APPLICATION_CREDENTIALS
+const client = new vision.ImageAnnotatorClient();
 
 mongoose.connect(DB_URI)
-  .then(() => console.log("✅ Conexión exitosa a MongoDB"))
-  .catch(err => console.error("❌ Error al conectar a MongoDB:", err));
-// ----------------------------------------------------------------------------------
+    .then(() => console.log("✅ Conexión exitosa a MongoDB"))
+    .catch(err => console.error("❌ Error al conectar a MongoDB:", err));
+    
 // Lógica para el número de ticket (ahora se obtiene desde la DB)
-// ----------------------------------------------------------------------------------
 async function getNextTicketNumber() {
     const ultimoRegistro = await Registro.findOne().sort({ ticket: -1 });
     let nextTicketNumber = 1000;
-    
+
 
     if (ultimoRegistro) {
         // Asume que el ticket es un número y lo incrementa
         nextTicketNumber = parseInt(ultimoRegistro.ticket) + 1;
     }
-    
+
     return nextTicketNumber.toString();
-    
+
 }
 
-// ... (resto del código: Multer, app.use(cors), app.get('/'), etc.)
+//Procesa el comprobante usando Google Vision y valida el contenido.
 
-// ------------------------------------------------
-// CONFIGURACIÓN DE MULTER (Subida de Comprobantes)
-// ------------------------------------------------
+async function validateComprobanteWithOCR(filePath) {
+    try {
+        const [result] = await client.textDetection(filePath);
+        const fullText = result.fullTextAnnotation ? result.fullTextAnnotation.text : '';
+        
+        if (!fullText) return false;
+        
+        const textUpper = fullText.toUpperCase();
+        
+        // Criterios de Validación (Monto S/ 50.00 y Beneficiario Davicross)
+        const requiredAmount = '50.00';
+        const companyKeywords = ['DAVICROSS', '20739903672', 'S.A.C']; 
+        
+        const amountCheck = textUpper.includes(requiredAmount) || textUpper.includes('S/50') || textUpper.includes('S. 50'); 
+        const companyCheck = companyKeywords.some(keyword => textUpper.includes(keyword));
+
+        return amountCheck && companyCheck;
+
+    } catch (error) {
+        console.error('Error al procesar el comprobante con Google Vision:', error);
+        return false; 
+    }
+}
+
 const UPLOADS_DIR = 'uploads/comprobantes/';
 
 // 1. Asegúrate de que la carpeta de subidas exista
@@ -62,20 +87,17 @@ const upload = multer({
     limits: { fileSize: 5 * 1024 * 1024 } // Límite de 5MB
 });
 
-// ------------------------------------------------
-// MIDDLEWARE
-// ------------------------------------------------
-// Permite peticiones desde el frontend (puerto 80/443 por defecto)
+
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production'
-    ? 'https://sorteo-premios.onrender.com'
-    : '*',
-  methods: ['GET', 'POST']
+    origin: process.env.NODE_ENV === 'production'
+        ? 'https://sorteo-premios.onrender.com'
+        : '*',
+    methods: ['GET', 'POST']
 }));
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.get(/^\/(?!api).*/, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'sorteo_de_premios.html'));
+    res.sendFile(path.join(__dirname, 'public', 'sorteo_de_premios.html'));
 });
 
 app.use(express.json());
@@ -84,34 +106,49 @@ app.use('/comprobantes', express.static(UPLOADS_DIR)); // Para servir los archiv
 // ------------------------------------------------
 // RUTA POST: REGISTRAR PARTICIPANTE (/api/register)
 // ------------------------------------------------
+// server.js (Modifica la ruta existente app.post('/api/register', ...)
+
 app.post('/api/register', upload.single('comprobante'), async (req, res) => {
-    // ... (Validaciones y Recolección de datos desde req.body y req.file)
     
-    // Asignar el ticket único (ahora es async)
-    const ticketId = await getNextTicketNumber(); // <-- Usa la función async
+    const file = req.file;
+    if (!file) {
+        return res.status(400).json({ success: false, message: 'Falta el comprobante de pago.' });
+    }
 
     try {
-        // 💾 GUARDAR EL REGISTRO EN MONGO DB
+        
+        // 🚨 PASO DE VALIDACIÓN OCR 🚨
+        const isValid = await validateComprobanteWithOCR(file.path);
+
+        if (!isValid) {
+            // Si la validación falla, BORRAMOS el archivo subido
+            fs.unlinkSync(file.path); 
+            return res.status(400).json({ 
+                success: false, 
+                message: 'El comprobante no pudo ser verificado. Confirme que sea de S/ 50.00 a Davicross.' 
+            });
+        }
+
+        // Si es válido, continuamos el proceso normal:
+        const ticketId = await getNextTicketNumber(); 
+        
         const nuevoRegistro = new Registro({
-            dni: req.body.dni,
-            nombres: req.body.nombres,
-            apellidos: req.body.apellidos,
-            whatsapp: req.body.whatsapp,
-            departamento: req.body.departamento,
-            ticket: ticketId, // Ticket real
-            comprobantePath: req.file.path // Ruta donde Multer guardó el archivo
+            ...req.body,
+            ticket: ticketId,
+            comprobantePath: file.path // Solo guardamos la ruta si fue validado
         });
 
-        await nuevoRegistro.save(); // <-- Guarda el documento en la DB
+        await nuevoRegistro.save(); 
 
-        // Respuesta de éxito
-        res.json({ success: true, message: 'Registro exitoso.', ticket: ticketId });
+        res.json({ success: true, message: '¡Registro y comprobante verificados exitosamente!', ticket: ticketId });
 
     } catch (error) {
-        console.error('Error al guardar en la base de datos:', error);
-        // Si hay error, podrías querer borrar el archivo subido
-        fs.unlinkSync(req.file.path); 
-        res.status(500).json({ success: false, message: 'Error interno del servidor al registrar.' });
+        console.error('Error durante el registro o OCR:', error);
+        // Manejo de error: Asegúrate de limpiar el archivo ante cualquier fallo
+        if (file && fs.existsSync(file.path)) {
+             fs.unlinkSync(file.path); 
+        }
+        res.status(500).json({ success: false, message: 'Error interno del servidor.' });
     }
 });
 
@@ -127,12 +164,12 @@ app.get('/api/tickets', async (req, res) => { // <-- Hacer la función async
 
     try {
         // 🔎 BUSCAR EN MONGO DB
-        const ticketsEncontrados = await Registro.find({ dni: dni }).exec(); 
-        
+        const ticketsEncontrados = await Registro.find({ dni: dni }).exec();
+
         if (ticketsEncontrados.length > 0) {
             const nombreCompleto = `${ticketsEncontrados[0].nombres} ${ticketsEncontrados[0].apellidos}`;
             const listaTickets = ticketsEncontrados.map(r => r.ticket);
-    
+
             res.json({
                 success: true,
                 name: nombreCompleto,
@@ -155,10 +192,10 @@ app.get('/api/tickets', async (req, res) => { // <-- Hacer la función async
 
 // Iniciar Servidor
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor Node.js corriendo en el puerto ${PORT}`);
-  console.log(`🔗 Endpoints disponibles:`);
-  console.log(`   - POST:https://sorteo-premios.onrender.com/api/register`);
-  console.log(`   - GET:https://sorteo-premios.onrender.com/api/tickets?dni=...`);
-  console.log(`🌐 En producción:https://sorteo-premios.onrender.com`);
+    console.log(`🚀 Servidor Node.js corriendo en el puerto ${PORT}`);
+    console.log(`🔗 Endpoints disponibles:`);
+    console.log(`   - POST:https://sorteo-premios.onrender.com/api/register`);
+    console.log(`   - GET:https://sorteo-premios.onrender.com/api/tickets?dni=...`);
+    console.log(`🌐 En producción:https://sorteo-premios.onrender.com`);
 });
 

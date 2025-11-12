@@ -59,10 +59,10 @@ async function validateComprobanteWithOCR(filePath) {
         const textUpper = fullText.toUpperCase();
 
         // Criterios de Validación (Monto S/ 50.00 y Beneficiario Davicross)
-        const requiredAmount = '50.00';
+        const requiredAmount = '10.00';
         const companyKeywords = ['DAVICROSS', '20739903672', 'S.A.C'];
 
-        const amountCheck = textUpper.includes(requiredAmount) || textUpper.includes('S/50') || textUpper.includes('S. 50');
+        const amountCheck = textUpper.includes(requiredAmount) || textUpper.includes('S/10') || textUpper.includes('S. 10');
         const companyCheck = companyKeywords.some(keyword => textUpper.includes(keyword));
 
         return amountCheck && companyCheck;
@@ -163,10 +163,9 @@ app.post('/api/register', upload.single('comprobante'), async (req, res) => {
     }
 });
 
-// ------------------------------------------------
-// RUTA GET: CONSULTAR TICKETS (/api/tickets?dni=...)
-// ------------------------------------------------
-app.get('/api/tickets', async (req, res) => { // <-- Hacer la función async
+// server.js (Modificación en la ruta app.get('/api/tickets', ...))
+
+app.get('/api/tickets', async (req, res) => {
     const dni = req.query.dni;
 
     if (!dni || dni.length !== 8) {
@@ -179,12 +178,28 @@ app.get('/api/tickets', async (req, res) => { // <-- Hacer la función async
 
         if (ticketsEncontrados.length > 0) {
             const nombreCompleto = `${ticketsEncontrados[0].nombres} ${ticketsEncontrados[0].apellidos}`;
-            const listaTickets = ticketsEncontrados.map(r => r.ticket);
+            
+            // --- DATOS ESTÁTICOS DEL SORTEO ---
+            const nombreDelPremio = 'Motocicleta Yamaha R15';
+            const imagenDelPremio = 'https://www.yamaha-motor.com.pe/file/v4685047748609769303/general/bloque01_r15_abs_peru.jpg'; 
+            const fechaDelSorteo = '31 de Diciembre de 2025'; 
+            const nombreInstitucion = 'Importaciones Davicross S.A.C.';
+            // ------------------------------------
+
+            // Transforma la respuesta para incluir el detalle del sorteo
+            const listaTicketsDetallados = ticketsEncontrados.map(r => ({
+                number: r.ticket,
+                prize: nombreDelPremio,
+                prizeImage: imagenDelPremio,
+                drawDate: fechaDelSorteo, 
+                institution: nombreInstitucion, 
+                status: 'Activo' // Estado por defecto
+            }));
 
             res.json({
                 success: true,
                 name: nombreCompleto,
-                tickets: listaTickets
+                tickets: listaTicketsDetallados 
             });
         } else {
             res.status(404).json({

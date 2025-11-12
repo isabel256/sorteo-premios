@@ -5,10 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sorteo - Importaciones Davicross S.A.C</title>
-    <link rel="shortcut icon" href="/images/imagen-catalogo.jpg" type="image/x-icon">
+    <link rel="shortcut icon" href="/public/images/imagen-catalogo.jpg" type="image/x-icon">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <style>
-      
         :root {
             --primary-color: #0A245C;
             /* Azul oscuro para elementos principales */
@@ -41,17 +40,19 @@
         body {
 
             font-family: var(--font-family);
-            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            /* background: #00000000; */
+            /* background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%); */
             min-height: 100vh;
             color: var(--text-dark);
             line-height: 1.6;
             display: flex;
             flex-direction: column;
             position: relative;
-            background-image: url('https://source.unsplash.com/random/1600x900?motorcycle,race');
+            background-image: url('https://img.freepik.com/vector-premium/fondo-ilustracion-actividad-caja-regalo-doble-11-festival-compras-promocion-sorteo-poster_432516-370.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
+
         }
 
         .all-content {
@@ -1000,6 +1001,99 @@
             background-color: transparent;
 
         }
+
+
+        /* tickets styles */
+        /* sorteo_de_premios.html (NUEVOS ESTILOS AGREGADOS) */
+
+        .ticket-detail-card {
+            /* Nueva tarjeta de detalle */
+            background: var(--card-bg);
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px dashed #eee;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .ticket-institution {
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 1.1em;
+        }
+
+        .ticket-number-box {
+            background: var(--secondary-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .ticket-body {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .ticket-prize-img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid var(--secondary-color);
+            flex-shrink: 0;
+        }
+
+        .ticket-info {
+            flex-grow: 1;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--text-dark);
+            display: block;
+            margin-top: 5px;
+        }
+
+        .info-value {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .ticket-status {
+            /* Etiqueta de estado en la esquina */
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--success-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* Modificación de estilos de lista existentes para que no interfieran */
+        .ticket-list li {
+            background-color: transparent;
+            border-left: none;
+            padding: 0;
+            margin-bottom: 0;
+        }
     </style>
 </head>
 
@@ -1043,8 +1137,6 @@
                     <div class="header-section">
                         <div class="capibara-icon">
                             <p class="icon_logo_principal">Davicross</p>
-                            <!-- <img class="icon_logo_principal" src="/images/princip-logo.png"
-                                alt="Logo animado de Capibara"> -->
                         </div>
                         <h1 class="header-title">¡REGÍSTRATE AQUÍ!</h1>
                         <p class="header-subtitle">Participa en nuestro increíble sorteo por una ¡SUPER MOTO!</p>
@@ -1125,7 +1217,7 @@
 
                             <div class="payment-section">
                                 <h2 class="payment-title">Costo del Ticket</h2>
-                                <div class="cost-display">S/ 50.00</div>
+                                <div class="cost-display">S/ 10.00</div>
                                 <p class="payment-message">¡Si aún no has realizado tu pago, puedes hacerlo ahora!</p>
                                 <div class="qr-codes">
                                     <div class="qr-item">
@@ -1145,7 +1237,7 @@
                                     RUC: 20739903672
                                 </div>
                                 <button type="submit" class="upload-btn">
-                                    <i class="bi bi-upload"></i> SUBIR COMPROBANTE Y REGISTRAR
+                                    <i class="bi bi-upload"> </i> SUBIR COMPROBANTE Y REGISTRAR
                                 </button>
                             </div>
                         </form>
@@ -1436,75 +1528,87 @@
             return false;
         }
 
-        // ----------------------------------------------------
-        // CONSULTA DE TICKETS (A PUNTO DE NODE.JS)
-        // ----------------------------------------------------
+       // (Función consultTickets)
 
         async function consultTickets() {
-            const dni = document.getElementById('dni-consult').value;
-            const resultsDiv = document.getElementById('consultResults');
+            const dni = document.getElementById('dniConsult').value.trim();
             const ticketList = document.getElementById('ticketList');
+            ticketList.innerHTML = '<li>Buscando tickets...</li>';
+            document.getElementById('resultDni').textContent = 'Consultando...';
+            document.getElementById('resultName').textContent = '';
 
-            if (dni.length !== 8 || isNaN(dni)) {
-                showTemporaryMessage('⚠️ Por favor, ingresa un DNI válido de 8 dígitos.', 'error');
+            if (!dni || dni.length !== 8) {
+                showTemporaryMessage('❌ Por favor, ingrese un DNI válido de 8 dígitos.', 'error');
+                ticketList.innerHTML = '';
                 return;
             }
 
-
-            resultsDiv.style.display = 'none';
-            ticketList.innerHTML = '';
-            showTemporaryMessage('⌛ Consultando datos en el servidor...', 'info');
+            // URL de tu API
+            const TICKETS_API_URL = 'https://sorteo-premios.onrender.com/api/tickets';
 
             try {
-                // Enviar la petición al servidor Node.js (ruta /api/tickets?dni=...)
                 const response = await fetch(`${TICKETS_API_URL}?dni=${dni}`);
                 const data = await response.json();
 
                 if (data.success) {
+                    ticketList.innerHTML = ''; // Limpiar el mensaje de 'Buscando tickets...'
                     document.getElementById('resultDni').textContent = dni;
                     document.getElementById('resultName').textContent = `Participante: ${data.name || 'N/A'}`;
-                    const alt = document.querySelector('.p');
-
-
 
                     if (data.tickets && data.tickets.length > 0) {
                         data.tickets.forEach(ticket => {
                             const li = document.createElement('li');
-                            li.className = 'text-p-ticket';
-                            li.innerHTML = `
-                                <div class="lineTicket">
-                                <div class="lineText">
-                                    <p>Numero de ticket: ${ticket}</p>
-                                    <span class="p" style="color: #33300088; font-size:10px; ">Estas participando en el sorteo de un(a)  <span />
-                                </div>
-                                <span class="icon bi bi-check-circle-fill" style="color: var(--success-color);"></span>
+                            li.className = 'ticket-item';
 
-                            </div>`;
+                            // ESTRUCTURA DETALLADA DEL TICKET
+                            li.innerHTML = `
+                        <div class="ticket-detail-card">
+                            <span class="ticket-status" style="background:${ticket.status === 'Ganador' ? 'var(--secondary-color)' : 'var(--success-color)'};">
+                                ${ticket.status}
+                            </span>
+                            
+                            <div class="ticket-header">
+                                <div class="ticket-institution">
+                                    <i class="bi bi-bank"></i> ${ticket.institution || 'Institución No Definida'}
+                                </div>
+                                <div class="ticket-number-box">
+                                    #${ticket.number}
+                                </div>
+                            </div>
+                            
+                            <div class="ticket-body">
+                                <img src="${ticket.prizeImage || ''}" alt="Imagen del premio" class="ticket-prize-img">
+                                <div class="ticket-info">
+                                    
+                                    <span class="info-label">Detalles del Sorteo:</span>
+                                    <span class="info-value">${ticket.prize || 'Premio Desconocido'}</span>
+                                    
+                                    <span class="info-label">Fecha del Sorteo:</span>
+                                    <span class="info-value">${ticket.drawDate || 'N/A'}</span>
+                                    
+                                    <span class="info-label">Estado:</span>
+                                    <span class="info-value">Actualmente ${ticket.status} (1 Fracción)</span>
+                                </div>
+                            </div>
+                            
+                        </div>`;
+
                             ticketList.appendChild(li);
                         });
-                        showTemporaryMessage(`✅ ${data.tickets.length} ticket(s) encontrado(s) exitosamente.`, 'success');
+                        showTemporaryMessage(`✅ ${data.tickets.length} constancia(s) de participación encontrada(s).`, 'success');
                     } else {
-                        const li = document.createElement('li');
-                        li.textContent = 'Aún no tienes tickets asignados.';
-                        ticketList.appendChild(li);
-                        showTemporaryMessage('⚠️ DNI registrado, pero sin tickets asignados.', 'error');
+                        ticketList.innerHTML = '<li><p>No se encontraron tickets registrados con este DNI.</p></li>';
+                        showTemporaryMessage('ℹ️ DNI sin tickets asignados.', 'info');
                     }
-                    resultsDiv.style.display = 'block';
-
                 } else {
-                    // Manejo de error 404/400 del servidor
-                    document.getElementById('resultDni').textContent = dni;
-                    document.getElementById('resultName').textContent = 'Participante: No encontrado';
-                    const li = document.createElement('li');
-                    li.innerHTML = `<span class="error-message">❌ ${data.message || 'Error en la consulta.'}</span>`;
-                    ticketList.appendChild(li);
-                    resultsDiv.style.display = 'block';
-                    showTemporaryMessage('⚠️ DNI no encontrado.', 'error');
+                    // Manejar errores de servidor (DNI no encontrado)
+                    ticketList.innerHTML = `<li><p>${data.message || 'Error al consultar tickets.'}</p></li>`;
+                    showTemporaryMessage(`❌ ${data.message || 'Error desconocido.'}`, 'error');
                 }
-
             } catch (error) {
-                console.error('Error al consultar:', error);
-                showTemporaryMessage('❌ Error de conexión con el servidor. Intenta de nuevo más tarde.', 'error');
+                console.error('Error en la consulta de tickets:', error);
+                ticketList.innerHTML = '<li><p>Error de conexión con el servidor de tickets.</p></li>';
+                showTemporaryMessage('❌ Error de red o servidor.', 'error');
             }
         }
 

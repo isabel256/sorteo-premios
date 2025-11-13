@@ -58,28 +58,27 @@ async function validateComprobanteWithOCR(filePath) {
 
     const textUpper = fullText.toUpperCase();
 
-    // 1. Criterios Críticos de Validación (S/ 50.00 a Davicross)
-    const requiredAmount = '50.00';
+    // 1. Criterios Críticos de Validación (S/ 10.00 a Davicross)
+    const requiredAmount = '10.00';
     const companyKeywords = ['DAVICROSS', '20739903672', 'S.A.C'];
 
     // 1.1 CHECK: MONTO
     const amountCheck =
       textUpper.includes(requiredAmount) ||
-      textUpper.includes('S/50') ||
-      textUpper.includes('S. 50');
+      textUpper.includes('S/10') ||
+      textUpper.includes('S. 10');
 
     if (!amountCheck) {
-      return { isValid: false, message: 'El monto no coincide. Debe ser S/ 50.00 exactos para participar.' };
+      return { isValid: false, message: 'El monto no coincide. Debe ser S/ 10.00 exactos para participar.' };
     }
 
     // 1.2 CHECK: BENEFICIARIO (DESTINATARIO)
-    const companyCheck = companyKeywords.some(keyword => textUpper.includes(keyword));
+    // const companyCheck = companyKeywords.some(keyword => textUpper.includes(keyword));
 
-    if (!companyCheck) {
-      return { isValid: false, message: 'El beneficiario no es Davicross. Confirme que el destinatario sea correcto.' };
-    }
+    // if (!companyCheck) {
+    //   return { isValid: false, message: 'El beneficiario no es Davicross. Confirme que el destinatario sea correcto.' };
+    // }
 
-    // 2. Criterios de Validación de Formato de Transacción (Frases clave, crítico contra recortes)
     
     // 2.1 CHECK: CÓDIGO DE SEGURIDAD
     if (!textUpper.includes('CÓDIGO DE SEGURIDAD') && !textUpper.includes('CODIGO DE SEGURIDAD')) {

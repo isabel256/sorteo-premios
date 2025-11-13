@@ -1161,6 +1161,12 @@
                                         <input type="text" id="apellidos" name="apellidos" placeholder="Tus apellidos"
                                             required>
                                     </div>
+                                    <div class="form-group">
+                                        <input type="text" id="nroOperacion" name="nroOperacion"
+                                            placeholder="Nro. de Operación del Comprobante" required minlength="5">
+
+                                    </div>
+
                                 </div>
                                 <div>
                                     <div class="form-group">
@@ -1470,12 +1476,15 @@
         async function handleRegistrationAndUpload(event) {
             event.preventDefault();
 
-            // Usamos el objeto FormData del formulario HTML directamente para incluir el archivo y los campos
             const form = document.getElementById('registrationForm');
+
             const formData = new FormData(form);
 
-            // 1. Recolección y Validación de Datos (desde el formulario)
-            const dni = formData.get('dni');
+            // Si tu lógica requiere el nroOperacion por separado para una validación en frontend:
+            const nroOperacion = formData.get('nroOperacion');
+
+            // 2. Recolección y Validación de Datos
+            const dni = formData.get('dni'); // Capturado automáticamente por new FormData(form)
             const comprobanteFile = document.getElementById('comprobante').files[0];
             const terminosAceptados = document.getElementById('terms').checked;
 
@@ -1483,39 +1492,44 @@
                 showTemporaryMessage('⚠️ Por favor, ingresa un DNI de 8 dígitos.', 'error');
                 return false;
             }
+
+            // Validación CLAVE ANTIFRAUDE: Verifica que el campo manual no esté vacío
+            if (!nroOperacion || nroOperacion.length < 5) {
+                showTemporaryMessage('⚠️ Debes ingresar el Nro. de Operación para validar el pago.', 'error');
+                return false;
+            }
+
             if (!comprobanteFile) {
                 showTemporaryMessage('⚠️ Debes adjuntar tu comprobante de pago.', 'error');
                 return false;
             }
+
             if (!terminosAceptados) {
                 showTemporaryMessage('⚠️ Debes aceptar los términos y condiciones.', 'error');
                 return false;
             }
 
-            // El objeto FormData ya incluye todos los campos de texto y el archivo
-
             showTemporaryMessage('⌛ Subiendo comprobante y registrando datos...', 'info');
 
             const uploadButton = document.querySelector('.upload-btn');
-            uploadButton.disabled = true; // Deshabilitar el botón
+            uploadButton.disabled = true;
 
             try {
-                // 2. Envío al Backend usando Fetch
+                // 3. Envío al Backend
                 const BACKEND_API_URL = 'https://sorteo-premios.onrender.com/api/register';
 
                 const response = await fetch(BACKEND_API_URL, {
                     method: 'POST',
-                    body: formData // Envío directo de FormData (incluye todos los campos y el archivo)
+                    body: formData // Enviamos el objeto 'formData' que ya contiene todos los datos
                 });
 
                 const data = await response.json();
                 uploadButton.disabled = false;
 
-                if (response.ok && data.success) { // El servidor devuelve status 200 y success: true
+                if (response.ok && data.success) {
                     showTemporaryMessage(`✅ Registro exitoso. ¡Tu ticket es el N° ${data.ticket}!`, 'success');
                     document.getElementById('registrationForm').reset();
                 } else {
-                    // Manejar errores de validación (status 400) o fallos lógicos del servidor
                     showTemporaryMessage(`❌ Error en el registro: ${data.message || 'Error desconocido del servidor.'}`, 'error');
                 }
 
@@ -1555,7 +1569,6 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    // 🚨 FIX CLAVE: Mostrar el contenedor de resultados
                     resultsDiv.style.display = 'block';
 
                     ticketList.innerHTML = ''; // Limpiar el mensaje de 'Buscando tickets...'

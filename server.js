@@ -156,18 +156,21 @@ app.get(/^\/(?!api).*/, (req, res) => {
 // ------------------------------------------------
 // RUTA POST: REGISTRAR PARTICIPANTE (CON DOBLE CHEQUEO)
 // ------------------------------------------------
+// ------------------------------------------------
+// RUTA POST: REGISTRAR PARTICIPANTE
+// ------------------------------------------------
 app.post('/api/register', upload.single('comprobante'), async (req, res) => {
+    // Las variables 'file' y 'nroOperacion' están definidas aquí para ser accesibles en el catch.
     const file = req.file;
-    // OBTENER nroOperacion del input manual del usuario
-    const { nroOperacion } = req.body;
+    const { nroOperacion } = req.body; // Obtener el Nro. de Operación
 
     if (!file) {
         return res.status(400).json({ success: false, message: 'Falta el comprobante de pago.' });
     }
 
-    // **VERIFICACIÓN DE AUTENTICIDAD CRÍTICA (Segundo Chequeo)**
+    // Validación CLAVE ANTIFRAUDE (Nro. de Operación)
     if (!nroOperacion || typeof nroOperacion !== 'string' || nroOperacion.length < 5) {
-        // Si el usuario no ingresó el número, se rechaza y se elimina el archivo subido
+        // Eliminar archivo si existe un error de datos de entrada
         if (file && fs.existsSync(file.path)) fs.unlinkSync(file.path);
         return res.status(400).json({
             success: false,
@@ -176,39 +179,56 @@ app.post('/api/register', upload.single('comprobante'), async (req, res) => {
     }
 
     try {
-        // 🚨 1. PRIMER CHEQUEO: OCR (Verifica que la imagen tenga el texto correcto)
-        const validationResult = await validateComprobanteWithOCR(file.path);
+        // 🚨 VALIDAR COMPROBANTE con OCR
+        const isValid = await validateComprobanteWithOCR(file.path);
 
-        if (!validationResult.isValid) {
-            // Si falla el OCR, se rechaza y se elimina el archivo subido
+        if (!isValid) {
             fs.unlinkSync(file.path);
             return res.status(400).json({
                 success: false,
-                message: validationResult.message
-
+                message: 'El comprobante no pudo ser verificado. Confirme que sea de S/ 50.00 a Davicross.'
             });
         }
 
-        // 🚀 2. REGISTRO FINAL 
         const ticketId = await getNextTicketNumber();
 
+        // 🔑 Se define 'nuevoRegistro' dentro del try para su uso
         const nuevoRegistro = new Registro({
             ...req.body,
             ticket: ticketId,
             comprobantePath: file.path,
-            // **GUARDAMOS** el Nro. de Operación manual para la verificación final (Auditoría)
-            nroOperacion: nroOperacion
+            nroOperacion: nroOperacion // Asegurar que el Nro. Operación se guarda
         });
 
         await nuevoRegistro.save();
 
         res.json({
             success: true,
-            message: '¡Registro, comprobante y Nro. de Operación verificados exitosamente! Su ticket ha sido generado.',
+            message: '¡Registro y comprobante verificados exitosamente!',
             ticket: ticketId
         });
     } catch (error) {
         console.error('Error durante el registro o OCR:', error);
+
+        // 🚨 MANEJO DE ERRORES DE CLAVE DUPLICADA (DNI o Nro. Operación)
+        if (error.name === 'MongoServerError' && error.code === 11000) {
+            // 'file' es accesible aquí, solucionando el ReferenceError
+            if (file && fs.existsSync(file.path)) fs.unlinkSync(file.path);
+
+            let errorMessage = '⛔ Ya existe un registro para este DNI. Solo se permite una participación.';
+
+            // Detectar si el índice duplicado es 'dni' o 'nroOperacion'
+            if (error.keyPattern && error.keyPattern.nroOperacion) {
+                errorMessage = '⚠️ Este Nro. de Operación ya fue utilizado para un registro. Verifique el comprobante.';
+            }
+
+            return res.status(409).json({
+                success: false,
+                message: errorMessage
+            });
+        }
+
+        // Manejo de errores genéricos
         if (file && fs.existsSync(file.path)) {
             fs.unlinkSync(file.path);
         }

@@ -59,10 +59,10 @@ async function validateComprobanteWithOCR(filePath) {
         const textUpper = fullText.toUpperCase();
 
         // Criterios de Validación (Monto S/ 10.00 y Beneficiario Davicross)
-        const requiredAmount = '10.00';
+        const requiredAmount = '50.00';
         const companyKeywords = ['DAVICROSS', '20739903672', 'S.A.C'];
 
-        const amountCheck = textUpper.includes(requiredAmount) || textUpper.includes('S/10') || textUpper.includes('S. 10');
+        const amountCheck = textUpper.includes(requiredAmount) || textUpper.includes('S/50') || textUpper.includes('S. 50');
         const companyCheck = companyKeywords.some(keyword => textUpper.includes(keyword));
 
         return amountCheck && companyCheck;

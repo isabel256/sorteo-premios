@@ -283,7 +283,7 @@ async function validateComprobanteWithOCR(filePath) {
         const [result] = await client.textDetection(filePath);
         const text = result.fullTextAnnotation?.text?.toUpperCase() || "";
 
-        const requiredAmount = ['10.00','S/10'];
+        const requiredAmount = ['50.00','S/50'];
         const companyKeywords = ['DAVICROSS','20739903672','S.A.C'];
 
         const amountCheck = requiredAmount.some(a => text.includes(a));

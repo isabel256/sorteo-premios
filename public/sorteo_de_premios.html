@@ -472,7 +472,7 @@
 
         /* --- Footer --- */
         .footer {
-            
+
             background: var(--primary-color);
             color: var(--text-light);
             padding: 40px 0;
@@ -732,8 +732,8 @@
             margin-top: 15px;
         }
 
-       
-         .ticket-list li {
+
+        .ticket-list li {
             background-color: transparent;
             border-left: none;
             padding: 0;
@@ -952,15 +952,15 @@
 
         }
 
-      
 
-     
+
+
 
 
 
 
         .ticket-detail-card {
- 
+
             background: var(--card-bg);
             border: 1px solid #ddd;
             border-radius: 12px;
@@ -970,7 +970,7 @@
             position: relative;
             overflow: hidden;
             margin-top: 30px;
-            
+
         }
 
         .ticket-header {
@@ -1040,8 +1040,6 @@
             font-weight: bold;
             text-transform: uppercase;
         }
-
-       
     </style>
 </head>
 
@@ -1110,7 +1108,7 @@
                                             required>
                                     </div>
                                     <div class="form-group">
-                                         <label for="nroOperacion">Nro. de Operación </label>
+                                        <label for="nroOperacion">Nro. de Operación </label>
                                         <input type="text" id="nroOperacion" name="nroOperacion"
                                             placeholder="Nro. de Operación del Comprobante" required minlength="5">
 
@@ -1426,7 +1424,6 @@
             event.preventDefault();
 
             const form = document.getElementById('registrationForm');
-
             const formData = new FormData(form);
 
             // Si tu lógica requiere el nroOperacion por separado para una validación en frontend:
@@ -1479,6 +1476,7 @@
                     showTemporaryMessage(`✅ Registro exitoso. ¡Tu ticket es el N° ${data.ticket}!`, 'success');
                     document.getElementById('registrationForm').reset();
                 } else {
+                    // Muestra el mensaje de error enviado por el servidor (ya sea 400, 409 o 500)
                     showTemporaryMessage(`❌ Error en el registro: ${data.message || 'Error desconocido del servidor.'}`, 'error');
                 }
 
@@ -1487,8 +1485,6 @@
                 uploadButton.disabled = false;
                 showTemporaryMessage('❌ Error de conexión con el servidor. Verifica la consola del navegador.', 'error');
             }
-            
-            
 
             return false;
         }
@@ -1558,10 +1554,10 @@
                                     <span class="info-value">${ticket.drawDate || 'N/A'}</span>
 
                                     <span class="info-label">N° de Operación:</span>
-                                     <span class="info-value">N° ${ticket.nroOperacion} (1 Fracción)</span>
+                                     <span class="info-value">N° ${ticket.nroOperacion}</span>
                                     
                                     <span class="info-label">Estado:</span>
-                                    <span class="info-value">Actualmente ${ticket.status}</span>
+                                    <span class="info-value">Actualmente ${ticket.status} (1 Fracción)</span>
                                 </div>
                             </div>
                             

@@ -58,7 +58,7 @@ async function validateComprobanteWithOCR(filePath) {
 
         const textUpper = fullText.toUpperCase();
 
-        // Criterios de Validación (Monto S/ 50.00 y Beneficiario Davicross)
+        // Criterios de Validación (Monto S/ 10.00 y Beneficiario Davicross)
         const requiredAmount = '10.00';
         const companyKeywords = ['DAVICROSS', '20739903672', 'S.A.C'];
 
@@ -98,13 +98,17 @@ const upload = multer({
     limits: { fileSize: 5 * 1024 * 1024 } // Límite de 5MB
 });
 
-
 app.use(cors({
-    origin: process.env.NODE_ENV === 'production'
-        ? 'https://sorteo-premios.onrender.com'
-        : '*',
-    methods: ['GET', 'POST']
+  origin: ['https://sorteo-premios.onrender.com', 'http://sorteo-premios.onrender.com'],
+  methods: ['GET', 'POST']
 }));
+
+// app.use(cors({
+//     origin: process.env.NODE_ENV === 'production'
+//         ? 'https://sorteo-premios.onrender.com'
+//         : '*',
+//     methods: ['GET', 'POST']
+// }));
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.get(/^\/(?!api).*/, (req, res) => {

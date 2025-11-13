@@ -241,7 +241,7 @@ app.get('/api/tickets', async (req, res) => {
       // Mapeo a objetos detallados, incluyendo el Nro. de Operación para auditoría (aunque el frontend lo oculte)
       const listaTicketsDetallados = ticketsEncontrados.map(r => ({
         number: r.ticket, 
-        nroOperacion: r.nroOperacion, // <--- INCLUIDO PARA TU AUDITORÍA EN LA RESPUESTA JSON
+        nroOperacion: r.nroOperacion,
         prize: nombreDelPremio,
         prizeImage: imagenDelPremio,
         drawDate: fechaDelSorteo,
@@ -260,11 +260,37 @@ app.get('/api/tickets', async (req, res) => {
         message: 'DNI no encontrado o sin tickets asignados.'
       });
     }
+ 
+
+    await nuevoRegistro.save();
+
+    res.json({
+      success: true,
+      message: '¡Registro y comprobante verificados exitosamente!',
+      ticket: ticketId
+    });
   } catch (error) {
-    console.error('Error al consultar la base de datos:', error);
-    res.status(500).json({ success: false, message: 'Error interno del servidor al consultar.' });
+    console.error('Error durante el registro o OCR:', error);
+
+    // 🚨 MANEJO DEL ERROR POR DNI DUPLICADO (Código 11000)
+    if (error.name === 'MongoServerError' && error.code === 11000) {
+    
+        if (file && fs.existsSync(file.path)) fs.unlinkSync(file.path);
+        
+        return res.status(409).json({ // 409 es el código HTTP de Conflicto
+            success: false,
+            message: '⛔ Ya existe un registro para este DNI. Solo se permite una participación.'
+        });
+    }
+
+    // Manejo de errores genéricos (otros errores)
+    if (file && fs.existsSync(file.path)) {
+      fs.unlinkSync(file.path);
+    }
+    res.status(500).json({ success: false, message: 'Error interno del servidor.' });
   }
 });
+
 
 // --- INICIAR SERVIDOR ---
 app.listen(PORT, () => {

@@ -1487,6 +1487,8 @@
                 uploadButton.disabled = false;
                 showTemporaryMessage('❌ Error de conexión con el servidor. Verifica la consola del navegador.', 'error');
             }
+            
+            
 
             return false;
         }
@@ -1554,9 +1556,12 @@
                                     
                                     <span class="info-label">Fecha del Sorteo:</span>
                                     <span class="info-value">${ticket.drawDate || 'N/A'}</span>
+
+                                    <span class="info-label">N° de Operación:</span>
+                                     <span class="info-value">N° ${ticket.nroOperacion} (1 Fracción)</span>
                                     
                                     <span class="info-label">Estado:</span>
-                                    <span class="info-value">Actualmente ${ticket.status} (1 Fracción)</span>
+                                    <span class="info-value">Actualmente ${ticket.status}</span>
                                 </div>
                             </div>
                             

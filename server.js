@@ -156,6 +156,9 @@ app.get(/^\/(?!api).*/, (req, res) => {
 // ------------------------------------------------
 // RUTA POST: REGISTRAR PARTICIPANTE (CON DOBLE CHEQUEO)
 // ------------------------------------------------
+// ------------------------------------------------
+// RUTA POST: REGISTRAR PARTICIPANTE (CON DOBLE CHEQUEO)
+// ------------------------------------------------
 app.post('/api/register', upload.single('comprobante'), async (req, res) => {
     // Las variables 'file' y 'nroOperacion' están definidas aquí para ser accesibles en el catch.
     const file = req.file;
@@ -176,25 +179,24 @@ app.post('/api/register', upload.single('comprobante'), async (req, res) => {
     }
 
     try {
-        // 🚨 VALIDAR COMPROBANTE con OCR
-        const isValid = await validateComprobanteWithOCR(file.path);
+        // 🚨 CORRECCIÓN CRÍTICA: Validar COMPROBANTE con OCR accediendo a .isValid
+        const validationResult = await validateComprobanteWithOCR(file.path);
 
-        if (!isValid) {
+        if (!validationResult.isValid) { // <--- ¡LA CORRECCIÓN! Chequea la propiedad booleana
             fs.unlinkSync(file.path);
             return res.status(400).json({
                 success: false,
-                message: 'El comprobante no pudo ser verificado. Confirme que sea de S/ 50.00 a Davicross.'
+                message: validationResult.message // Usar el mensaje de error específico del OCR
             });
         }
 
         const ticketId = await getNextTicketNumber();
 
-        // 🔑 Se define 'nuevoRegistro' dentro del try para su uso
         const nuevoRegistro = new Registro({
             ...req.body,
             ticket: ticketId,
             comprobantePath: file.path,
-            nroOperacion: nroOperacion // Asegurar que el Nro. Operación se guarda
+            nroOperacion: nroOperacion
         });
 
         await nuevoRegistro.save();
@@ -207,14 +209,15 @@ app.post('/api/register', upload.single('comprobante'), async (req, res) => {
     } catch (error) {
         console.error('Error durante el registro o OCR:', error);
 
-        // 🚨 MANEJO DE ERRORES DE CLAVE DUPLICADA (DNI o Nro. Operación)
+        // MANEJO DE ERRORES DE CLAVE DUPLICADA (DNI o Nro. Operación)
         if (error.name === 'MongoServerError' && error.code === 11000) {
-            // 'file' es accesible aquí, solucionando el ReferenceError
             if (file && fs.existsSync(file.path)) fs.unlinkSync(file.path);
 
-            let errorMessage = '⛔ Ya existe un registro para este DNI. Solo se permite una participación.';
+            let errorMessage = '';
+            errorMessage = '⚠️ Ya existe un registro para este DNI.Solo se permite una participación.';
 
-            // Detectar si el índice duplicado es 'dni' o 'nroOperacion'
+
+
             if (error.keyPattern && error.keyPattern.nroOperacion) {
                 errorMessage = '⚠️ Este Nro. de Operación ya fue utilizado para un registro. Verifique el comprobante.';
             }

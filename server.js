@@ -185,6 +185,7 @@ app.post('/api/register', upload.single('comprobante'), async (req, res) => {
       return res.status(400).json({
         success: false,
         message: validationResult.message 
+        
       });
     }
 

@@ -6,6 +6,7 @@ const registroSchema = new mongoose.Schema({
     apellidos: { type: String, required: true },
     whatsapp: { type: String, required: true },
     departamento: { type: String, required: true },
+    nroOperacion: { type: String, required: true },
     ticket: { type: String, required: true, unique: true }, // Número de ticket único
     comprobantePath: { type: String, required: true }, // Ruta del archivo subido
     fechaRegistro: { type: Date, default: Date.now }

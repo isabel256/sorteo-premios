@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=0.8">
     <title>Sorteo - Importaciones Davicross S.A.C</title>
     <link rel="shortcut icon" href="/imagen-catalogo.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
@@ -21,7 +21,8 @@
             --error-color: #e74c3c;
             --bg-gradient-start: #667eea;
             --bg-gradient-end: #764ba2;
-            --font-family: 'Poppins', sans-serif;
+            /* --font-family: 'Poppins', sans-serif; */
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             --card-bg: #ffffff;
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
@@ -148,7 +149,7 @@
             width: 100%;
             min-height: 100vh;
             opacity: 0;
-            transform: translateX(100%);
+            transform: translateY(-10%);
             transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.6s ease-in-out;
             pointer-events: none;
             display: flex;
@@ -161,7 +162,7 @@
 
         .screen.active {
             opacity: 1;
-            transform: translateX(0);
+            transform: translateY(0);
             pointer-events: auto;
             position: relative;
 
@@ -471,7 +472,7 @@
 
         /* --- Footer --- */
         .footer {
-
+            
             background: var(--primary-color);
             color: var(--text-light);
             padding: 40px 0;
@@ -731,16 +732,12 @@
             margin-top: 15px;
         }
 
-        .ticket-list li {
-            background-color: #f3fdf6;
-            border-left: 4px solid var(--success-color);
-            padding: 10px 15px;
-            margin-bottom: 8px;
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 500;
+       
+         .ticket-list li {
+            background-color: transparent;
+            border-left: none;
+            padding: 0;
+            margin-bottom: 0;
         }
 
         .ticket-list li .icon {
@@ -955,59 +952,15 @@
 
         }
 
-        .anuncios {
-            display: none;
-            max-width: 250px;
-            border: 1px solid #333;
-            background-color: #E8E9EC;
-            padding: 10px;
-            position: fixed;
-            bottom: 40px;
-            left: 10px;
-        }
+      
 
-        .anuncios .img {
-            width: 100%;
-        }
-
-        .anuncios iframe {
-            height: 200px;
-            width: 100%;
-        }
-
-        .flex-anuncio {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .flex-anuncio .closse {
-            width: 100%;
-            max-width: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 30px;
-            cursor: pointer;
-
-        }
-
-        .flex-anuncio .closse:hover {
-            background-color: #0000004f;
-        }
-
-        .anuncio-modal-container {
-
-            border: none;
-            background-color: transparent;
-
-        }
+     
 
 
-        /* tickets styles */
-        /* sorteo_de_premios.html (NUEVOS ESTILOS AGREGADOS) */
+
 
         .ticket-detail-card {
-            /* Nueva tarjeta de detalle */
+ 
             background: var(--card-bg);
             border: 1px solid #ddd;
             border-radius: 12px;
@@ -1016,6 +969,8 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             position: relative;
             overflow: hidden;
+            margin-top: 30px;
+            
         }
 
         .ticket-header {
@@ -1023,7 +978,7 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px dashed #eee;
-            padding-bottom: 10px;
+            padding: 10px 0;
             margin-bottom: 10px;
         }
 
@@ -1074,26 +1029,19 @@
         }
 
         .ticket-status {
-            /* Etiqueta de estado en la esquina */
             position: absolute;
-            top: 15px;
+            top: 5px;
             right: 15px;
             background: var(--success-color);
             color: white;
             padding: 3px 8px;
             border-radius: 4px;
-            font-size: 0.8em;
+            font-size: 0.6em;
             font-weight: bold;
             text-transform: uppercase;
         }
 
-        /* Modificación de estilos de lista existentes para que no interfieran */
-        .ticket-list li {
-            background-color: transparent;
-            border-left: none;
-            padding: 0;
-            margin-bottom: 0;
-        }
+       
     </style>
 </head>
 
@@ -1162,6 +1110,7 @@
                                             required>
                                     </div>
                                     <div class="form-group">
+                                         <label for="nroOperacion">Nro. de Operación </label>
                                         <input type="text" id="nroOperacion" name="nroOperacion"
                                             placeholder="Nro. de Operación del Comprobante" required minlength="5">
 
@@ -1347,7 +1296,7 @@
         <section id="tickets" class="screen">
             <div class="container">
                 <div class="main-content tickets-section">
-                    <h2 class="tickets-title"><i class="bi bi-ticket-fill"></i>MIS TICKETS</h2>
+                    <h2 class="tickets-title"><i class="bi bi-ticket"></i>MIS TICKETS</h2>
                     <p>Ingresa tu DNI para ver los números de ticket que tienes asignados.</p>
 
                     <div class="consultation-form">
@@ -1358,11 +1307,11 @@
                         <button class="consult-btn" onclick="consultTickets()">
                             <i class="bi bi-search"></i> Consultar Tickets
                         </button>
-
                         <div id="consultResults" style="display:none;">
                             <h4>Resultados para DNI: <span id="resultDni"></span></h4>
                             <p id="resultName"></p>
                             <p>Tus Tickets Adquiridos:</p>
+
                             <ul class="ticket-list" id="ticketList">
                                 <!-- Aqui va la lista de tickets -->
                             </ul>
@@ -1640,7 +1589,7 @@
         // CONTADOR REGRESIVO 
         // ----------------------------------------------------
 
-        const countdownDate = new Date("September 30, 2026 17:00:00").getTime();
+        const countdownDate = new Date("December 31, 2025 15:00:00").getTime();
         const countdownElement = document.getElementById("countdown");
         const afterOverlay = document.getElementById("after-sorteo");
 

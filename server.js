@@ -156,9 +156,6 @@ app.get(/^\/(?!api).*/, (req, res) => {
 // ------------------------------------------------
 // RUTA POST: REGISTRAR PARTICIPANTE (CON DOBLE CHEQUEO)
 // ------------------------------------------------
-// ------------------------------------------------
-// RUTA POST: REGISTRAR PARTICIPANTE
-// ------------------------------------------------
 app.post('/api/register', upload.single('comprobante'), async (req, res) => {
     // Las variables 'file' y 'nroOperacion' están definidas aquí para ser accesibles en el catch.
     const file = req.file;
@@ -261,7 +258,7 @@ app.get('/api/tickets', async (req, res) => {
             // Mapeo a objetos detallados, incluyendo el Nro. de Operación para auditoría (aunque el frontend lo oculte)
             const listaTicketsDetallados = ticketsEncontrados.map(r => ({
                 number: r.ticket,
-                nroOperacion: r.nroOperacion,
+                nroOperacion: r.nroOperacion, // <--- INCLUIDO PARA TU AUDITORÍA EN LA RESPUESTA JSON
                 prize: nombreDelPremio,
                 prizeImage: imagenDelPremio,
                 drawDate: fechaDelSorteo,
@@ -280,48 +277,11 @@ app.get('/api/tickets', async (req, res) => {
                 message: 'DNI no encontrado o sin tickets asignados.'
             });
         }
-
-
-        // server.js (dentro de app.post('/api/register', ...))
-
-        // ... (código antes del catch)
-
-        await nuevoRegistro.save();
-
-        res.json({
-            success: true,
-            message: '¡Registro y comprobante verificados exitosamente!',
-            ticket: ticketId
-        });
     } catch (error) {
-        console.error('Error durante el registro o OCR:', error);
-
-        // 🚨 MANEJO DE ERRORES DE CLAVE DUPLICADA (DNI o Nro. Operación)
-        if (error.name === 'MongoServerError' && error.code === 11000) {
-            if (file && fs.existsSync(file.path)) fs.unlinkSync(file.path); // Elimina el archivo subido
-
-            // Detectar si el índice duplicado es 'dni' o 'nroOperacion'
-            let errorMessage = '⛔ Ya existe un registro para este DNI. Solo se permite una participación.';
-
-            // Mongoose guarda el campo fallido en error.keyValue o error.errmsg
-            if (error.keyPattern && error.keyPattern.nroOperacion) {
-                errorMessage = '⚠️ Este Nro. de Operación ya fue utilizado para un registro. Verifique el comprobante.';
-            }
-
-            return res.status(409).json({
-                success: false,
-                message: errorMessage
-            });
-        }
-
-        // Manejo de errores genéricos (otros errores)
-        if (file && fs.existsSync(file.path)) {
-            fs.unlinkSync(file.path);
-        }
-        res.status(500).json({ success: false, message: 'Error interno del servidor.' });
+        console.error('Error al consultar la base de datos:', error);
+        res.status(500).json({ success: false, message: 'Error interno del servidor al consultar.' });
     }
 });
-
 
 // --- INICIAR SERVIDOR ---
 app.listen(PORT, () => {

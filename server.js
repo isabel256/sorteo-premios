@@ -4,8 +4,8 @@ const path = require('path');
 const fs = require('fs');
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
-const mongoose = require('mongoose'); // <-- Para MongoDB
-const Registro = require('./models/registro'); // <-- Importa el modelo
+const mongoose = require('mongoose');
+const Registro = require('./models/registro'); // Asume que este modelo incluye 'nroOperacion'
 require('dotenv').config();
 
 const app = express();
@@ -17,12 +17,12 @@ const vision = require('@google-cloud/vision');
 let client;
 
 if (process.env.GOOGLE_CREDENTIALS_JSON) {
-  // Para producción (Render): usa el JSON pegado directamente en la variable segura
+  // Para producción (Render)
   client = new vision.ImageAnnotatorClient({
     credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON)
   });
 } else {
-  // Para desarrollo local: usa el archivo local (GOOGLE_APPLICATION_CREDENTIALS)
+  // Para desarrollo local
   client = new vision.ImageAnnotatorClient();
 }
 
@@ -37,14 +37,15 @@ async function getNextTicketNumber() {
   let nextTicketNumber = 1000;
 
   if (ultimoRegistro) {
-    nextTicketNumber = parseInt(ultimoRegistro.ticket) + 1;
+    // Asegura que el ticket sea un número para la suma
+    nextTicketNumber = parseInt(ultimoRegistro.ticket) + 1; 
   }
 
   return nextTicketNumber.toString();
 }
 
 // ----------------------------------------------------------------------------------
-// --- FUNCIÓN ACTUALIZADA: VALIDAR COMPROBANTE CON GOOGLE VISION OCR ---
+// --- FUNCIÓN DE VALIDACIÓN OCR (Primer Chequeo) ---
 // ----------------------------------------------------------------------------------
 async function validateComprobanteWithOCR(filePath) {
   try {
@@ -58,27 +59,27 @@ async function validateComprobanteWithOCR(filePath) {
     const textUpper = fullText.toUpperCase();
 
     // 1. Criterios Críticos de Validación (S/ 50.00 a Davicross)
-    const requiredAmount = '10.00';
+    const requiredAmount = '50.00';
     const companyKeywords = ['DAVICROSS', '20739903672', 'S.A.C'];
 
     // 1.1 CHECK: MONTO
     const amountCheck =
       textUpper.includes(requiredAmount) ||
-      textUpper.includes('S/10') ||
-      textUpper.includes('S. 10');
+      textUpper.includes('S/50') ||
+      textUpper.includes('S. 50');
 
     if (!amountCheck) {
-      return { isValid: false, message: 'El monto no coincide. Debe ser S/ 10.00 exactos para participar.' };
+      return { isValid: false, message: 'El monto no coincide. Debe ser S/ 50.00 exactos para participar.' };
     }
 
-    // 1.2 CHECK: BENEFICIARIO
-    // const companyCheck = companyKeywords.some(keyword => textUpper.includes(keyword));
+    // 1.2 CHECK: BENEFICIARIO (DESTINATARIO)
+    const companyCheck = companyKeywords.some(keyword => textUpper.includes(keyword));
 
-    // if (!companyCheck) {
-    //   return { isValid: false, message: 'El beneficiario no es Davicross. Confirme el destinatario.' };
-    // }
+    if (!companyCheck) {
+      return { isValid: false, message: 'El beneficiario no es Davicross. Confirme que el destinatario sea correcto.' };
+    }
 
-    // 2. Criterios de Validación de Formato de Transacción (Frases clave)
+    // 2. Criterios de Validación de Formato de Transacción (Frases clave, crítico contra recortes)
     
     // 2.1 CHECK: CÓDIGO DE SEGURIDAD
     if (!textUpper.includes('CÓDIGO DE SEGURIDAD') && !textUpper.includes('CODIGO DE SEGURIDAD')) {
@@ -93,21 +94,17 @@ async function validateComprobanteWithOCR(filePath) {
     // 3. Criterios de Validación de Vigencia (NO FATAL - SOLO ADVERTENCIA)
     const now = new Date();
     const currentYear = now.getFullYear().toString();
+    // Obtiene el mes actual en español (ej: NOV) para una advertencia suave.
+    const currentMonthShort = now.toLocaleString('es-ES', { month: 'short' }).toUpperCase().replace('.', ''); 
     
-    // Obtiene el nombre corto del mes actual en español (ej: NOV)
-    const currentMonthShort = now.toLocaleString('es-ES', { month: 'short' }).toUpperCase().replace('.', '');
-    
-    // CHECK AÑO (no fatal, solo registra en el log)
     if (!textUpper.includes(currentYear)) {
         console.warn(`[OCR] Advertencia: No se detectó el año ${currentYear} en el comprobante.`);
     }
 
-    // CHECK MES (no fatal, solo registra en el log)
     if (!textUpper.includes(currentMonthShort)) {
         console.warn(`[OCR] Advertencia: No se detectó el mes actual (${currentMonthShort}) en el comprobante. Puede ser una transacción antigua.`);
     }
 
-    // Si todos los cheques esenciales (monto, beneficiario, frases clave) pasan
     return { isValid: true, message: 'Comprobante verificado exitosamente.' };
 
   } catch (error) {
@@ -123,6 +120,7 @@ if (!fs.existsSync(UPLOADS_DIR)) {
   fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 }
 
+// Configuración de Multer para el almacenamiento local (Recordatorio: esto es efímero en Render)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, UPLOADS_DIR);
@@ -139,7 +137,7 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 } // Límite de 5MB
 });
 
-// --- CORS ---
+// --- CORS y Middleware ---
 app.use(cors({
   origin: process.env.NODE_ENV === 'production'
     ? 'https://sorteo-premios.onrender.com'
@@ -147,50 +145,66 @@ app.use(cors({
   methods: ['GET', 'POST']
 }));
 
-// --- ARCHIVOS ESTÁTICOS ---
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.json());
+app.use(express.json()); 
 app.use('/comprobantes', express.static(UPLOADS_DIR));
 
+// Ruta raíz para servir el HTML principal
 app.get(/^\/(?!api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'sorteo_de_premios.html'));
 });
 
 // ------------------------------------------------
-// RUTA POST: REGISTRAR PARTICIPANTE (CON OCR DETALLADO)
+// RUTA POST: REGISTRAR PARTICIPANTE (CON DOBLE CHEQUEO)
 // ------------------------------------------------
 app.post('/api/register', upload.single('comprobante'), async (req, res) => {
   const file = req.file;
+  // OBTENER nroOperacion del input manual del usuario
+  const { nroOperacion } = req.body; 
+
   if (!file) {
     return res.status(400).json({ success: false, message: 'Falta el comprobante de pago.' });
   }
 
+  // **VERIFICACIÓN DE AUTENTICIDAD CRÍTICA (Segundo Chequeo)**
+  if (!nroOperacion || typeof nroOperacion !== 'string' || nroOperacion.length < 5) {
+      // Si el usuario no ingresó el número, se rechaza y se elimina el archivo subido
+      if (file && fs.existsSync(file.path)) fs.unlinkSync(file.path);
+      return res.status(400).json({
+          success: false,
+          message: 'Error: Debe ingresar el Nro. de Operación manual para validar la autenticidad.'
+      });
+  }
+
   try {
-    // 🚨 VALIDAR COMPROBANTE con el nuevo objeto de respuesta
+    // 🚨 1. PRIMER CHEQUEO: OCR (Verifica que la imagen tenga el texto correcto)
     const validationResult = await validateComprobanteWithOCR(file.path);
 
     if (!validationResult.isValid) {
-      // Usa el mensaje detallado de la validación
+      // Si falla el OCR, se rechaza y se elimina el archivo subido
       fs.unlinkSync(file.path);
       return res.status(400).json({
         success: false,
-        message: validationResult.message // <-- USA EL MENSAJE DETALLADO
+        message: validationResult.message 
       });
     }
 
+    // 🚀 2. REGISTRO FINAL 
     const ticketId = await getNextTicketNumber();
 
     const nuevoRegistro = new Registro({
       ...req.body,
       ticket: ticketId,
-      comprobantePath: file.path
+      comprobantePath: file.path,
+      // **GUARDAMOS** el Nro. de Operación manual para la verificación final (Auditoría)
+      nroOperacion: nroOperacion 
     });
 
     await nuevoRegistro.save();
 
     res.json({
       success: true,
-      message: '¡Registro y comprobante verificados exitosamente!',
+      message: '¡Registro, comprobante y Nro. de Operación verificados exitosamente! Su ticket ha sido generado.',
       ticket: ticketId
     });
   } catch (error) {
@@ -203,13 +217,13 @@ app.post('/api/register', upload.single('comprobante'), async (req, res) => {
 });
 
 // ------------------------------------------------
-// RUTA GET: CONSULTAR TICKETS
+// RUTA GET: CONSULTAR TICKETS (CON DETALLES Y NRO. OPERACIÓN)
 // ------------------------------------------------
 app.get('/api/tickets', async (req, res) => {
   const dni = req.query.dni;
 
   if (!dni || dni.length !== 8) {
-    return res.status(400).json({ success: false, message: 'DNI inválido.' });
+    return res.status(400).json({ success: false, message: 'DNI inválido. Debe tener 8 dígitos.' });
   }
 
   try {
@@ -218,24 +232,27 @@ app.get('/api/tickets', async (req, res) => {
     if (ticketsEncontrados.length > 0) {
       const nombreCompleto = `${ticketsEncontrados[0].nombres} ${ticketsEncontrados[0].apellidos}`;
 
+      // Definición de constantes del sorteo (para el frontend)
       const nombreDelPremio = 'Motocicleta Yamaha R15';
       const imagenDelPremio = 'https://www.yamaha-motor.com.pe/file/v4685047748609769303/general/bloque01_r15_abs_peru.jpg';
       const fechaDelSorteo = '31 de Diciembre de 2025';
       const nombreInstitucion = 'Importaciones Davicross S.A.C.';
 
+      // Mapeo a objetos detallados, incluyendo el Nro. de Operación para auditoría (aunque el frontend lo oculte)
       const listaTicketsDetallados = ticketsEncontrados.map(r => ({
-        number: r.ticket,
+        number: r.ticket, 
+        nroOperacion: r.nroOperacion, // <--- INCLUIDO PARA TU AUDITORÍA EN LA RESPUESTA JSON
         prize: nombreDelPremio,
         prizeImage: imagenDelPremio,
         drawDate: fechaDelSorteo,
         institution: nombreInstitucion,
-        status: 'Activo'
+        status: 'Activo' 
       }));
 
       res.json({
         success: true,
         name: nombreCompleto,
-        tickets: listaTicketsDetallados
+        tickets: listaTicketsDetallados 
       });
     } else {
       res.status(404).json({

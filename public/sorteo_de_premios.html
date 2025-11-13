@@ -1528,14 +1528,18 @@
             return false;
         }
 
-       // (Función consultTickets)
+        // (Función consultTickets)
 
         async function consultTickets() {
             const dni = document.getElementById('dniConsult').value.trim();
+            const resultsDiv = document.getElementById('consultResults');
             const ticketList = document.getElementById('ticketList');
+
+            // 1. Mostrar estado de carga y ocultar resultados anteriores
             ticketList.innerHTML = '<li>Buscando tickets...</li>';
             document.getElementById('resultDni').textContent = 'Consultando...';
             document.getElementById('resultName').textContent = '';
+            resultsDiv.style.display = 'none'; // Por defecto, oculto
 
             if (!dni || dni.length !== 8) {
                 showTemporaryMessage('❌ Por favor, ingrese un DNI válido de 8 dígitos.', 'error');
@@ -1551,6 +1555,9 @@
                 const data = await response.json();
 
                 if (data.success) {
+                    // 🚨 FIX CLAVE: Mostrar el contenedor de resultados
+                    resultsDiv.style.display = 'block';
+
                     ticketList.innerHTML = ''; // Limpiar el mensaje de 'Buscando tickets...'
                     document.getElementById('resultDni').textContent = dni;
                     document.getElementById('resultName').textContent = `Participante: ${data.name || 'N/A'}`;
@@ -1597,11 +1604,14 @@
                         });
                         showTemporaryMessage(`✅ ${data.tickets.length} constancia(s) de participación encontrada(s).`, 'success');
                     } else {
+                        // Si no hay tickets, mostramos la sección para ver el mensaje de "No se encontraron"
+                        resultsDiv.style.display = 'block';
                         ticketList.innerHTML = '<li><p>No se encontraron tickets registrados con este DNI.</p></li>';
                         showTemporaryMessage('ℹ️ DNI sin tickets asignados.', 'info');
                     }
                 } else {
-                    // Manejar errores de servidor (DNI no encontrado)
+                    // Si el servidor devuelve error (ej. DNI no encontrado)
+                    resultsDiv.style.display = 'block';
                     ticketList.innerHTML = `<li><p>${data.message || 'Error al consultar tickets.'}</p></li>`;
                     showTemporaryMessage(`❌ ${data.message || 'Error desconocido.'}`, 'error');
                 }

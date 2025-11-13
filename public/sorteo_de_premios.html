@@ -1145,9 +1145,7 @@
                     <div class="form-section">
                         <form id="registrationForm" onsubmit="return handleRegistrationAndUpload(event)">
                             <div class="form-grid">
-
                                 <div>
-
                                     <div class="form-group">
                                         <label for="dni">DNI / C. de Extranjería</label>
                                         <input type="text" id="dni" name="dni" placeholder="Ingresa tu documento"
@@ -1165,7 +1163,6 @@
                                     </div>
                                 </div>
                                 <div>
-
                                     <div class="form-group">
                                         <label for="whatsapp-register">Número de WhatsApp</label>
                                         <input type="tel" id="whatsapp-register" name="whatsapp"
@@ -1201,7 +1198,6 @@
                                             <option value="San Martin">San Martin</option>
                                             <option value="Huancavelica">Huancavelica</option>
                                         </select>
-
                                     </div>
                                     <div class="form-group">
                                         <label for="comprobante">Adjuntar Comprobante de Pago</label>
@@ -1215,12 +1211,6 @@
                                                     style="color:var(--secondary-color);">términos y
                                                     condiciones</a></label>
                                         </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <input type="hidden" id="premio" name="premio" value="Motocicleta Yamaha R15">
-                                        <input type="hidden" id="imagenPremio" name="imagenPremio"
-                                            value="https://www.yamaha-motor.com.pe/file/v4685047748609769303/general/bloque01_r15_abs_peru.jpg">
-
                                     </div>
                                 </div>
                             </div>
@@ -1538,7 +1528,7 @@
             return false;
         }
 
-        // (Función consultTickets)
+       // (Función consultTickets)
 
         async function consultTickets() {
             const dni = document.getElementById('dniConsult').value.trim();
@@ -1685,14 +1675,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             showScreen('main');
         });
-
-        function selectPrize(nombre, imagen) {
-            document.getElementById('premio').value = nombre;
-            document.getElementById('imagenPremio').value = imagen;
-            showScreen('main');
-            showTemporaryMessage(`🎟️ Estás participando por: ${nombre}`, 'info');
-        }
-
 
 
     </script>

@@ -515,7 +515,7 @@
             text-transform: uppercase;
             color: var(--text-light);
             margin-top: 5px; 
-            
+
         }
 
 
@@ -1532,12 +1532,13 @@
         // (Función consultTickets)
 
         async function consultTickets() {
-            const dni = document.getElementById('dniConsult');
+            const dni = document.getElementById('dniConsult').value.trim();
+            const dniFocus = document.getElementById('dniConsult');
             const resultsDiv = document.getElementById('consultResults');
             const ticketList = document.getElementById('ticketList');
 
-            dni.value.trim();
-            dni.focus();
+            
+            dniFocus.focus();
 
             // 1. Mostrar estado de carga y ocultar resultados anteriores
             ticketList.innerHTML = '<li>Buscando tickets...</li>';

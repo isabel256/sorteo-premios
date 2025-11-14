@@ -57,6 +57,7 @@
         }
 
         .all-content {
+            
             width: 100%;
             margin: auto;
             position: relative;
@@ -84,9 +85,11 @@
             flex-direction: column;
             align-items: center;
             gap: 10px;
+            
         }
 
         .announcement-bar {
+            
             background-color: var(--secondary-color);
             color: var(--text-light);
             padding: 8px 15px;
@@ -104,18 +107,20 @@
             justify-content: space-evenly;
             flex-wrap: wrap;
             gap: 15px;
-            margin-top: 10px;
+           
+            
+             
         }
 
 
         .nav-btn {
 
-            padding: 12px 25px;
+            padding: 10px 15px;
             border: none;
             border-radius: 30px;
             background-color: transparent;
             color: var(--text-light);
-            font-weight: 600;
+            font-weight: 300;
             cursor: pointer;
             transition: all 0.3s ease;
             text-decoration: none;
@@ -130,6 +135,7 @@
             transform: scale(1.05);
             box-shadow: 0 0 15px rgba(255, 102, 0, 0.6);
             border: 2px solid var(--text-light);
+            font-weight: 600;
         }
 
         .nav-btn:hover {
@@ -203,7 +209,7 @@
             margin: 30px auto;
             overflow: hidden;
             box-shadow: var(--shadow);
-            max-width: 700px;
+            max-width: 1200px;
             width: 100%;
         }
 
@@ -213,6 +219,7 @@
             text-align: center;
             color: var(--text-light);
             position: relative;
+            
         }
 
         .header-section::before {
@@ -227,7 +234,6 @@
         }
 
         .header-section>* {
-
             position: relative;
             z-index: 2;
         }
@@ -327,15 +333,14 @@
             width: 100%;
             padding: 15px;
             border: 2px solid #5a759e1e;
-            /* Borde más oscuro */
             border-radius: 10px;
             font-size: 1em;
             background-color: #f0f2f5;
-            /* Fondo claro para inputs */
             color: var(--text-dark);
             transition: all 0.3s ease;
             box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
         }
+        
 
         .form-group input:focus,
         .form-group select:focus {
@@ -349,13 +354,10 @@
         .form-group input[type="file"] {
             padding: 15px 10px;
             background-color: var(--text-light);
-            /* Color claro */
-            /* border: 2px dashed var(--secondary-color); */
-            /* Borde punteado para destacar */
             cursor: pointer;
         }
 
-        .checkbox-group {
+        .checkbox-group{
 
             display: flex;
             align-items: center;
@@ -367,7 +369,6 @@
 
             width: 20px;
             height: 20px;
-
             accent-color: var(--secondary-color);
             /* Color de la casilla al marcar */
         }
@@ -480,7 +481,6 @@
             box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.2);
             margin-top: auto;
 
-            /* Empuja el footer hacia abajo */
         }
 
         #countdown {
@@ -585,7 +585,7 @@
             background: var(--card-bg);
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: var(--shadow);
+            /* box-shadow: var(--shadow); */
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             text-align: left;
         }
@@ -1040,6 +1040,45 @@
             font-weight: bold;
             text-transform: uppercase;
         }
+
+        .not_visible {
+            position: relative;
+          
+
+        }
+
+        .not_visible::before {
+            width: 100%;
+            height: 100%;
+            align-content: center;
+            text-align: center;
+            top: 0;
+            opacity: 0; 
+            transition: opacity 0.3s ease;
+            content: 'Producto No disponible';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            cursor: no-drop;
+            transform: translate(-50%, -50%);
+            background-color: #6a00ff80;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 5px;
+            white-space: nowrap;
+            z-index: 10;
+            bottom: 0;
+        }
+
+
+        .not_visible:hover::before {
+            opacity: 1;
+            /* pointer-events: visible; */
+
+
+
+
+        }
     </style>
 </head>
 
@@ -1207,7 +1246,7 @@
                         <p class="header-subtitle">¡Mira lo que puedes ganar en nuestro sorteo!</p>
                     </div>
                     <div class="prizes-grid">
-                        <div class="prize-card">
+                        <div class="prize-card not_visible">
                             <div class="prize-image">
                                 <img src="https://i.ytimg.com/vi/t_cepBoA3vQ/maxresdefault.jpg"
                                     alt="Premio Casa de 3 habitaciones">
@@ -1221,7 +1260,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="prize-card">
+                        <div class="prize-card not_visible">
                             <div class="prize-image">
                                 <img src="https://www.toyotaperu.com.pe/sites/default/files/360/avanza22_blancow09_00.jpg"
                                     alt="Premio Automóvil Toyota">
@@ -1247,7 +1286,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="prize-card">
+                        <div class="prize-card not_visible">
                             <div class="prize-image">
                                 <img src="https://static8.depositphotos.com/1006899/896/i/450/depositphotos_8961765-stock-photo-prize.jpg"
                                     alt="Premio Dinero en efectivo">
@@ -1260,7 +1299,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="prize-card">
+                        <div class="prize-card not_visible">
                             <div class="prize-image">
                                 <img src="https://market-resized.envatousercontent.com/previews/files/460537976/590.jpg?w=590&h=590&cf_fit=crop&crop=top&format=auto&q=85&s=9768beaa32033d61611eb94d42e6192b5b2fdf0005123a057f52ec37c0bde78b"
                                     alt="Premio iPhone 15 Pro Max">
@@ -1273,7 +1312,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="prize-card">
+                        <div class="prize-card not_visible">
                             <div class="prize-image">
                                 <img src="https://www.shutterstock.com/image-photo/man-giving-dollar-banknotes-woman-600nw-2581188037.jpg"
                                     alt="Premio Dinero en efectivo">
@@ -1294,7 +1333,7 @@
         <section id="tickets" class="screen">
             <div class="container">
                 <div class="main-content tickets-section">
-                    <h2 class="tickets-title"><i class="bi bi-ticket"></i>MIS TICKETS</h2>
+                    <h2 class="tickets-title">MIS TICKETS</h2>
                     <p>Ingresa tu DNI para ver los números de ticket que tienes asignados.</p>
 
                     <div class="consultation-form">
@@ -1356,7 +1395,7 @@
                     <i class="bi bi-facebook"></i> Facebook
                 </a>
             </div>
-            <p>&copy; 2026 Importaciones Davicross S.A.C. Todos los derechos reservados.</p>
+            <p>&copy; 2025 Importaciones Davicross S.A.C. Todos los derechos reservados.</p>
             <div class="legal-links">
                 <a href="#">Política de Privacidad</a> | <a href="#">Términos y Condiciones</a>
             </div>
@@ -1492,9 +1531,12 @@
         // (Función consultTickets)
 
         async function consultTickets() {
-            const dni = document.getElementById('dniConsult').value.trim();
+            const dni = document.getElementById('dniConsult');
             const resultsDiv = document.getElementById('consultResults');
             const ticketList = document.getElementById('ticketList');
+
+            dni.value.trim();
+            dni.focus();
 
             // 1. Mostrar estado de carga y ocultar resultados anteriores
             ticketList.innerHTML = '<li>Buscando tickets...</li>';
